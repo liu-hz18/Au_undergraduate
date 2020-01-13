@@ -1,0 +1,29 @@
+.highlighted {
+    color: red;
+}
+
+form{
+    margin-left: 650px;
+}
+
+a {
+    font-size: large;
+    margin-left: 290px;
+    font-family: sans-serif;
+}
+
+.text {
+    margin-bottom: 30px;
+    margin-left: 300px;
+    margin-right: 350px;
+
+}
+
+.search_num{
+    margin-left: 290px;
+    margin-right: 300px;
+    font-family: myFirstFont;
+    src: url(sansation_bold.woff);
+    font-weight:bold;
+}
+
