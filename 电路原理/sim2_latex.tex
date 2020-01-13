@@ -1,0 +1,144 @@
+\documentclass[UTF8]{article}
+\usepackage{ctex}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\geometry{left=3.0cm,right=3.0cm,top=2.0cm,bottom=3.0cm}
+
+\begin{document}
+{\songti
+\begin{center}{\heiti\textbf{第二次仿真作业}\\
+		\textbf{	刘泓尊\qquad2018011446 \qquad 自81} \\
+	}
+\end{center}
+一、可调占空比的脉冲序列发生器
+
+(1)电路原理图:
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=9cm,height=10cm]{2_.png}
+	\caption{脉冲序列发生器电路原理图}
+\end{figure}
+占空比可调的原因:
+
+图示运放是正反馈方式，所以它在稳态下的输出只能为$U_{sat}$或$-U_{sat}$设电容的初始状态为0，即$u_c(0^-)=0$。假设实际电路存在小扰动，导致输出电压为$-U_{sat}$则此时运放同相输入端的电位为$-0.5U_{sat}$，电容开始充电。
+
+我们先来推导反相输入端所连电阻为R时的情况:
+
+根据三要素法：
+$$u_c(0^+)=0\qquad u_c(\infty)=-U_{sat}\qquad\tau=RC$$
+求得电容电压为:
+$$u_c(t)=-U_{sat}(1-e^{-\frac{t}{\tau}})$$
+此后电容电压按指数规律下降，当$u_c=-U_{sat}$时,输出发生跳变$u_0=U_{sat}$。电路发生换路，依然根据三要素法:
+$$u_c(0^+)=-0.5U_{sat}\qquad u_c(\infty)=U_{sat}\qquad\tau = RC$$
+求得电容电压为
+$$u_c(t)=U_{sat}+(-0.5U_{sat}-U_{sat})e^{\frac{t}{\tau}}$$
+此后电压按指数规律上升，当$u_c=0.5U_{sat}$时，输出发生跳变，$u_0=0.5U_{sat}$。此时电容的初值$u_c(0^+)=0.5U_{sat}$.此后电路进入稳态，即电路的电容电压以及输出电压进行周期性变化。
+
+根据三要素法得:
+$$u_c(t)=-U_{sat}+(0.5U_{sat}U_{sat})e^{\frac{t}{\tau}}$$
+脉冲序列的周期为:
+$$u_c(t)\big| _{t=0.5T}=-U_{sat}+(0.5U_{sat}+U_{sat})e^{-\frac{t}{\tau}}=-0.5U_{sat}$$
+解得:
+$$T=2RC\ln3$$
+图示电路将反相输入端所连电阻换成了带有二极管的电路，根据理想二极管的单向导通特性，可以得出$u_0=U_{sat}$时，$D_2$导通，滑动变阻器左半部分$R_{f1}$接入电路。$u_0=-U_{sat}$时，$D_1$导通，滑动变阻器右半部分$R_{f2}$接入电路。将这两种情况带入上式。得到输出电压的占空比为:
+$$k=\frac{R_{f1}}{R_2}$$
+所以，通过调节$R_{f1}$占总电阻值的比例，可以实现占空比可调的脉冲序列发生器。
+
+(2)仿真电路图
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=11.5cm,height=11cm]{2_1_1.png}
+	\caption{仿真电路图(此时占空比为50\%)}
+\end{figure}
+(3)示波器波形图
+
+占空比为20\%时(调节变阻器阻值为80\%)：
+
+示波器波形图为(黄色为输出电压波形，蓝色为电容电压波形)：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=9cm]{2_1_3.png}
+	\caption{示波器波形图(占空比为20\%)}
+\end{figure}
+根据图像所示信息，可得实际占空比
+$$k=\frac{23.537}{112.202}=20.9\%$$
+和仿真结果和理论结果相近。
+
+占空比为70\%时(调节变阻器阻值为30\%)：
+
+示波器波形图为(黄色为输出电压波形，蓝色为电容电压波形)：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=9cm]{2_1_4.png}
+	\caption{示波器波形图(占空比为70\%)}
+\end{figure}
+根据图像所示信息，可得实际占空比
+$$k=\frac{81.501}{116.120}=70.1\%$$
+和仿真结果和理论结果相近。
+
+(4)实验结论:
+
+教材电路给出了形成占空比为50\%的电路，本实验通过应用二极管和滑动变阻器，实现了对于占空比的调节，在误差允许范围内，可以实现预期的占空比结果。\\
+
+
+二、三角波发生器
+
+(1)电路原理图：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm,height=10cm]{2_2_5.png}
+	\caption{三角波发生器电路原理图}
+\end{figure}
+三角波产生的原因：
+
+电路左侧为题一设计的脉冲序列发生器。右侧连接积分电路，通过对方波电压进行积分获得三角波波形。
+
+下面对于积分电路进行分析:
+对于积分电路电容$C_2$,有
+$$i_c=-C\frac{du_o}{dt}\qquad i_{R_1}=\frac{u_i}{R_1}$$
+又由$i_C=i_R$得，
+$$-C\frac{du_o}{dt}=\frac{u_i}{R}$$
+即
+$$u_0=-\frac{1}{R_1C}\int u_idt $$
+根据积分原理，对方波左侧电路产生的方波电压$u_i$进行积分，可以获得三角波电压$u_o$
+\[u_{o1}=
+\begin{cases}
+-U_{sat}
+&\text{$2nT<t<(2n+1)T$}\\
+U_{sat} 
+&\text{$(2n+1)T<t<(2n+2)T$}\\
+\end{cases}\]
+
+\[u_{o}=
+\begin{cases}
+\frac{U_{sat}}{R_1 C}(t-2nT)
+&\text{$2nT<t<(2n+1)T$}\\
+-\frac{U_{sat}}{R_1 C}(t-(2n+2)T)
+&\text{$(2n+1)T<t<(2n+2)T$}\\
+\end{cases}\]
+
+(2)仿真电路图:
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm,height=10cm]{2_2_1.png}
+	\caption{三角波发生器仿真电路图}
+\end{figure}
+
+(3)示波器波形图(红线为三角波波形,蓝线为脉冲序列波形):
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=13cm,height=9cm]{2_2_2.png}
+	\caption{三角波波形和脉冲序列波形}
+\end{figure}
+值得注意的是,由于本实验建立在正反馈的基础上,正反馈的建立过程中，右半部分的积分电路也在进行积分，所以最终输出的三角波波形并不是以时间轴为中心，而是有一定偏移，仿真结果已经调整了三角波波形，使得三角波在中心。
+
+(4)实验结论：
+
+本实验通过结合脉冲序列发生器和积分电路，实现了三角波波形的输出，示波器给出的波形和理论分析相符。
+}
+
+\end{document}

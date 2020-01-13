@@ -1,0 +1,233 @@
+\documentclass[UTF8]{article}
+\usepackage{CTEX}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\geometry{left=3.0cm,right=3.0cm,top=2.0cm,bottom=3.0cm}
+
+\begin{document}
+{\songti 
+	\begin{center}{\heiti\textbf{第*次仿真作业}}\\
+	\textbf{\heiti\textbf{刘泓尊}}
+	\end{center}
+	1.\quad{\heiti 第一题}\\
+	\textbf{(1).}我们先来推导$U(a)$与$R_1,R_2,R_3,U_{s1},U_{s2}$的关系式：
+	\par{设通过$R_1$的电流为$I_1$(向上为正)，通过$R_3$的电流为$I_2$(向下为正)，则,}
+	\par{对于左侧网孔,由$KCL$和$KVL$有：}
+	$$-U_{s1}+I_1R_1+(I_1 – I_2)R_2+U_{s2} = 0;\eqno{(1)}     $$
+	\par{对于最外侧一圈回路，由$KVL$有：}
+	$$-U_{s1} +I_1R_1+I_2R_3 = 0;\eqno{(2)}				$$
+	\par{而由电压降关系:}
+	$$0+U_{s1}-I_1R_1 = U(a);\eqno{(3)}					$$
+	\par{由(1)(2)(3)式得：}
+	$$U(a) = \frac{U_{s1}R_2R_3+ U_{s2}R_1R_3}{R_1R_2+R_2R_3+R_1R_3};		\eqno{(4)}$$
+	\par{带入数据得：}
+	$$U(a) = 3.6V$$\\
+	\textbf{(2).}接下来我们来推导并计算$U(a)$和$R_1,R_2,R_3$的绝对灵敏度：
+	\par{将(4)式分别对$R_1,R_2,R_3$求偏导得：}
+	$$\frac{\partial{U(a)}}{\partial{R_1}} = \frac{R_2R_3[R_3U_{s2}-(R_2+R_3)U_{s1}]}{(R_1R_2+R_2R_3+R_1R_3)^2}		\eqno{(5)}$$
+	$$\frac{\partial{U(a)}}{\partial{R_2}} = \frac{R_1R_3[R_3U_{s1}-(R_1+R_3)U_{s2}]}{(R_1R_2+R_2R_3+R_1R_3)^2}		\eqno{(6)}$$
+	$$\frac{\partial{U(a)}}{\partial{R_3}} = \frac{R_1R_2(U_{s1}+R_1U_{s2})}{(R_1R_2+R_2R_3+R_1R_3)^2}\eqno{(7)}$$
+	\par{带入数据得：}
+	$$\frac{\partial{U(a)}}{\partial{R_1}} = -0.03V/\Omega$$
+	$$\frac{\partial{U(a)}}{\partial{R_2}} = -0.33 V/\Omega$$
+	$$\frac{\partial{U(a)}}{\partial{R_3}} = 0.48 V/\Omega$$\\
+	\textbf{(3).}a.采用如下图1电路求$U(a)$对$R_1,R_2,R_3$的绝对灵敏度：
+	\begin{figure}[H]
+		\centering
+		\vspace*{-10pt}
+		\includegraphics[width=9cm,height=7cm]{1.png}
+		\caption{灵敏度分析仿真电路}
+	\end{figure}
+	\par{b.绝对灵敏度的仿真结果如图2：}
+	\begin{figure}[H]
+		\centering
+		\includegraphics{2.png}
+		\caption{灵敏度分析仿真结果}
+	\end{figure}
+	可见理论计算结果和仿真结果在误差允许范围内相等，计算结论成立。\\
+	\textbf{(4).}偏差分析.
+	\par{1.使用绝对灵敏度进行误差分析：}
+	\par{使用全微分对$U(a)$的偏差量$\Delta{U(a)}$进行线性近似,得:}
+	$$\Delta{U(a)}=\Delta{R_1} \frac{\partial{U(a)}}{\partial{R_1}} + \Delta{R_2}  \frac{\partial{U(a)}}{\partial{R_2}} + \Delta{R_3}  \frac{\partial{U(a)}}{\partial{R_3}};\eqno{(8)}$$		
+	\par{a.取$R_1,R_2,R_3$的偏差量$\Delta{R_1}= -0.4\Omega,\Delta{R_2} = -0.4\Omega ,\Delta{R_3}= 0.3\Omega$,带入(8)式得：}
+	$$\Delta{U(a)}=0.288V$$
+	\par{显然}
+	$$\left|\Delta{U(a)}\right|< 10*3.6V = 0.36V$$
+    \par{所以,$U(a)$的偏差不超过其工作点的10\%，可以确保电路正常工作。}
+	\par{b.取$R_1,R_2,R_3$的偏差量$\Delta{R_1}= 0.4\Omega,\Delta{R_2} = 0.4\Omega ,\Delta{R_3}= -0.3\Omega$,带入(8)式得：}
+	$$\Delta{U(a)}=-0.288V$$
+	\par{显然}
+	$$\left|\Delta{U(a)}\right|< 10*3.6V = 0.36V$$
+	\par{所以,$U(a)$的偏差不超过其工作点的10\%，可以确保电路正常工作。}
+	(事实上，由于利用全微分进行线性近似，所以b情况的结果与a必然互为相反数,但是为了接下来与（5）中讨论建立对应关系，所以将b的情况写在此处)	
+	2.使用相对灵敏度进行误差分析：
+	\par{由(4)(5)(6)(7)式,可得对应的相对灵敏度为:}
+	$$\frac{{dU(a)}}{U(a)}=\frac{R_1R_2R_3[R_3U_{s2}-(R_2+R_3)U_{s1}]}{(U_{s1}R_2R_3+U_{s2}R_1R_3)(R_1R_2+R_2R_3+R_1R_3)}\frac{dR_1}{R_1}\eqno{(9)}$$
+	$$\frac{{dU(a)}}{U(a)}=\frac{R_1R_2R_3[R_3U_{s1}-(R_1+R_3)U_{s2}]}{(U_{s1}R_2R_3+U_{s2}R_1R_3)(R_1R_2+R_2R_3+R_1R_3)}\frac{dR_1}{R_1}\eqno{(10)}$$
+	$$\frac{{dU(a)}}{U(a)}=\frac{R_1R_2R_3(R_2U_{s1}+R_1U_{s2})}{(U_{s1}R_2R_3+U_{s2}R_1R_3)(R_1R_2+R_2R_3+R_1R_3)}\frac{dR3}{R3} \eqno {(11)}$$
+	\par{带入数据得:}
+	$$\frac{{dU(a)}}{U(a)}= -\frac{1}{30} \frac{dR_1}{R_1}\quad,\quad
+	\frac{{dU(a)}}{U(a)}= -\frac{11}{30}\frac{dR_2}{R_2}\quad,\quad
+    \frac{{dU(a)}}{U(a)}=  \frac{2}{5} \frac{dR_3}{R_3}\eqno{(12)}$$
+	
+	a.若$R_1,R_2$产生10\%的负偏差，$R_3$产生10\%的正偏差，带入上式得：
+	$\frac{{dU(a)}}{U(a)} = 8\%$ ,
+	所以$\left|\frac{{dU(a)}}{U(a)}\right|< 10\%$所以电路可以正常工作。\\
+	b.若$R_1,R_2$产生10\%的正偏差，$R_3$产生10\%的负偏差，带入上式得：
+	$\frac{{dU(a)}}{U(a)} = -8\% $,所以$\left|\frac{{dU(a)}}{U(a)}\right| <10\%$
+	所以电路可以正常工作。\\\\
+	\textbf{(5).}将最大偏差所对应的阻值带入式(4)中，可得：
+	\par{a.取$R_1 = 3.6\Omega，R_2 = 3.6\Omega，R_3 = 3.3\Omega$ ,带入(4)中，得:}
+	$U(a)_1^{'} = 3.882V$
+	\par\par{根据全微分进行的近似结果为$U(a)_1 = 3.888V$}
+	\par\par{两者差距$\delta = U(a)_1^{'} - U(a)_1 = -0.006V$}
+	\par\par{所以实际对应电压比(4)中近似电压\quad{小0.006V。}}
+	\\
+	\par{b.取$R_1 = 4.4\Omega，R_2 = 4.4\Omega，R_3 = 2.7\Omega$ ,带入(4)中，得:}
+	$U(a)_2^{'} = 3.306V$
+	\par\par{根据全微分进行的近似结果为$U(a)_2 = 3.312V$}
+	\par\par{两者差距$\delta = U(a)_2^{'} - U(a)_2 = -0.006V$}
+	\par\par{所以实际对应电压比(4)中近似电压\quad{小0.006V。}}	\\
+	综合以上讨论，可以看到对应最大偏差阻值所产生的$U(a)$值均比近似计算电压 \quad{小0.006V}。\\\\
+	下面我们来尝试分析产生这一结果的原因：
+	\par{首先,从物理的角度，由于
+    \textbf{$\frac{\partial{U(a)}}{\partial{R_1}}, \frac{\partial{U(a)}}{\partial{R_2}}, \frac{\partial{U(a)}}{\partial{R_3}}$
+	均会随$R_1,R_2,R_3$的值变化而变化}，所以三者产生误差时，仅使用在标准值处的全微分进行线性近似是不足以反映实际的。\par{或者可以说，使用全微分进行近似计算仅仅采用了$R_1,R_2,R_3$方向单独进行了近似，但是$R_1,R_2,R_3$三者共同变化时对于$U(a)$的影响并未考虑到，所以会产生误差。}
+	\par{其次，在数学上，由于全微分一阶近似的误差:}
+	$$\left|\Delta{U(a)}-\left(\Delta{R_1} \frac{\partial{U(a)}}{\partial{R_1}} + \Delta{R_2}  \frac{\partial{U(a)}}{\partial{R_2}} + \Delta{R_3}  \frac{\partial{U(a)}}{\partial{R_3}}\right)\right| = o\left(\sqrt{\Delta{R_1^2}+\Delta{R_2^2}+\Delta{R_3^2}}\right)\eqno{(13)}$$
+	即近似计算与实际值之间相差了一个高阶无穷小。
+	所以使用全微分进行近似估计的误差会无可避免地出现。
+    }
+	\\\\2.\quad{\heiti 第二题}\\用运算放大器实现电压跟随器。
+	\par{仿真电路如下图3：}
+		\begin{figure}[H]
+		\centering
+		\vspace*{-10pt}
+		\includegraphics[width=11cm,height=7cm]{2_3.png}
+		\caption{电压跟随器仿真电路}
+	\end{figure}
+	\par{参数扫描结果如下图4(转折点处电压已用游标标出)：}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=16cm,height=8cm]{2_2.png}
+		\caption{电压跟随器输出信号随输入信号的变化波形图}
+	\end{figure}
+	
+	3.\quad{\heiti {第三题}}\par{使用运算放大器实现$3x+2y-0.5z$的信号运算功能}
+	\par{仿真电路如下图5：}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=18cm,height=7.5cm]{3_1.png}
+		\caption{$3x+2y-0.5z$ 的仿真电路}
+	\end{figure}
+	(2)分析输出和输入信号$x,y,z$的关系：
+	\par{本电路由两个运算放大器和若干电阻构成。左侧运放处理$x,y$信号。}
+	\par{应用“虚短”和“虚断”，得$$u_-=u_+=0\quad,\quad{i_+ = i_-=0}\eqno{(14)}$$}
+	\par{在左侧运放输入端应用$KCL$，在$R_1,R_2,R_3$上应用$KVL$和欧姆定律得：}
+	$$\frac{u_x-0}{R_1}+\frac{u_y-0}{R_2} = \frac{0-u_1}{R_3}\eqno{(15)}$$
+	对于右侧运放，类似于上述分析可得
+	$$\frac{u_z-0}{R_7}+\frac{u_1-0}{R_4} = \frac{0-u_{out}}{R_5}\eqno{(16)}$$
+	\par{带入数据得：}
+	$$u_{out} = 3u_x+2u_y-0.5u_z\eqno{(17)}$$
+	所以实现了$3x+2y-0.5z$的运算。\\\\
+	(3)表格与误差分析\\
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+			\hline 
+			&\multicolumn{3}{c|}{1} &\multicolumn{3}{c|}{2}&  \multicolumn{3}{c|}{3}  &\multicolumn{3}{c|}{4} \\ 
+			\cline{2-13} 
+			& x & y & z & x & y & z & x & y & z & x & y & z \\ 
+			\cline{2-13} 
+			& 1 & 1 & 1 & 1 & 3 & 2 & -2 & 2 & 0 & 3 & 3 & 2 \\ 
+			\hline 
+			理论输出& \multicolumn{3}{c|}{4.5}  & \multicolumn{3}{c|}{8} & \multicolumn{3}{c|}{-2}&\multicolumn{3}{c|}{14} \\ 
+			\hline 
+			实际输出& \multicolumn{3}{c|}{4.5}  & \multicolumn{3}{c|}{8} & \multicolumn{3}{c|}{-2}&\multicolumn{3}{c|}{13.6} \\
+			\hline 
+		\end{tabular}
+	\caption{输出信号与输入信号的关系}
+	\end{table}
+	{\heiti{可见当输入$(x,y,z)=(3,3,2)V$时，仿真输出和理论输出不同，原因是，}}
+	\par{在此情况下，运放的供电电压不足以支持其正常工作。可以发现，当把两个运放的供电电压增大为$20V$时，输出结果为$14V$，和理论结果相同。
+	因此，可能的解决方案为 \heiti{增大运放的供电电压}，使得运放可以正常工作。}
+	\\\\4.\quad{\heiti 第四题}\par{使用仿真软件实现由运放构成的负电阻电路}
+		\par{仿真电路如下图6：}
+	\begin{figure}[H]
+		\centering
+		\vspace*{-10pt}
+		\includegraphics[width=8.5cm,height=9.5cm]{4.png}
+		\caption{负电阻电路仿真电路}
+	\end{figure}
+	\par{参数扫描结果如下图7：}
+ 	\begin{figure}[H]
+		\centering
+		\includegraphics[width=15cm,height=8cm]{4_3.png}
+		\caption{输入电流$i_1$随输入电压$u_1$变化的波形图}
+	\end{figure}
+	仿真曲线显示：
+	\par{在-10V到-5.5V段图像斜率$k_1 = 0.1m\Omega>0$}
+	\par{在-5.5V到4.5V段图像斜率 $k_2 = -0.2m\Omega < 0$,可以视为“负电阻”。}
+	\par{在4.5V段到10V段图像斜率 $k_3 = 0.1m\Omega > 0$}
+	\par{转折点电流电压已在图中标出。}\\
+    \\下面分析产生上述结果的原因：
+	1.当$-U_{ds}<u_1<U_{ds}$时，运放 工作在线性区，同时满足“虚短”和“虚断”特性。
+	根据“虚短”特性，有
+	$$u_+ =u_-=u_1\eqno{(18)}$$
+	根据“虚断”特性，有
+	$$i_1=\frac{u_+-u_0}{R_1}\eqno{(19)}$$
+	$$i_2=\frac{u_--u_0}{R_2}\eqno{(20)}$$
+	根据欧姆定律，有
+	$$0-u_- = i_2R\eqno{(21)}$$
+	由(17)(18)(19)(20)式，得等效电阻R'关系式为：
+	$$R^{'} = -\frac{RR_1}{R_2}<0\eqno{(22)}$$
+	代入数据得：$R^{'} = -5K\Omega$\\
+	斜率$k_1 = \frac{1}{R^{'}} = -0.2mS$,与仿真结果相符\\
+	该段电路等效于$R^{'} = -5K\Omega$的“负电阻”。
+	
+	
+	2.当$u1>U_{ds}$时，“虚断”依然成立，“虚短”不再成立。则此时，
+	$$U_0 = U_{sat}\eqno{(23)}$$ 
+	由“虚断”特性：$$i_1 = \frac{u_1-U_0}{R_1}\eqno{(24)}$$
+	即$$i_1 = \frac{1}{R_1}u_1 – \frac{U_{sat}}{R_1}\eqno{(25)}$$
+	斜率$k_2=\frac{1}{R_1} = 0.1mS$，与仿真结果相符。
+	\par{该段曲线等效于如下图电路：}
+	\begin{figure}[H]
+		\centering
+		\includegraphics{5.png}
+		\caption{$u_1>U_{ds}$时的等效电路}
+	\end{figure}
+	
+	3.当$u_1<-U_{ds}$时，类似于2的分析方法，得$i_1$随$U_1$变化的关系式为：
+	$$i_1 = \frac{1}{R_1}{u_1}+\frac{U_{sat}}{R_1}\eqno{(26)}$$
+	斜率$k_2 = \frac{1}{R_1} = 0.1mS$，与仿真结果相符。
+	\par{该段曲线等效于如下图电路：}
+	\begin{figure}[H]
+		\centering
+		\includegraphics{6.png}
+		\caption{$u_1<U_{ds}$时的等效电路}
+	\end{figure}
+	综合以上分析得到$i_1$随$u_1$的变化函数为：
+	\[i_1=
+		\begin{cases}
+			-\frac{RR_1}{R_2}u_1 
+			&\text{$-U_{ds}\le u_1\le U_{ds}$}\\
+			 \frac{1}{R_1}u_1 – \frac{U_{sat}}{R_1} &\text{\quad$u1>U_{ds}$}\\
+	 		\frac{1}{R_1}u_1+\frac{U_{sat}}{R_1} &\text{\quad$u_1<-U_{ds}$}
+		\end{cases}\]
+	下面对于图像转折点进行分析：
+	显然，图像发生转折是由于 运放 的工作区间发生了变化，并且由于运放的输入输出特性曲线是连续的，所以$i_1$随$u_1$变化的曲线也是连续的。
+	$u_1 = U_{ds}$时，带入对应电流关系式，得：$$i_1 = -0.2mS\times(-5.19V)  \approx0.13mA\eqno{(27)}$$
+	$u_1 =-U_{ds}$时，带入对应电流关系式，得：$$i_1 = -0.2mS\times(4.53V) \approx-0.9mA\eqno{(28)}$$
+	与仿真结果接近。\\
+	{\heiti{仿真结果与实际结果存在偏差的原因分析:}}\\
+	首先，运放“虚断”特性是建立在运放是“理想”的情况下的，但是实际上尽管使用了$k\Omega$级别的电阻，将运放视为输入电阻“无穷大”依然是和实际存在误差的。
+	“虚短”特性也是建立在开环放大倍数$A$为$\infty$的情况下的。所以理论和实际存在误差。
+	其次，由于仿真软件进行扫描取点，得到的仿真曲线精度取决于取样密度，即每次取样的“增量”，这也会对仿真曲线产生一定的误差。
+	}
+\end{document}
+

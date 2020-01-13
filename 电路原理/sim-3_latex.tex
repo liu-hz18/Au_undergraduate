@@ -1,0 +1,181 @@
+\documentclass[UTF8]{article}
+\usepackage{ctex}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\geometry{left=3.0cm,right=3.0cm,top=2.0cm,bottom=3.0cm}
+
+\begin{document}
+{
+\begin{center}{\textbf{第三次仿真作业}\\
+		\textbf{	刘泓尊\qquad2018011446 \qquad 自81} \\
+	}
+\end{center}
+
+一、	根据附录补充知识设计正弦波发生器
+
+1.	文氏电桥
+
+根据相量形式的串并联分压关系，可得：
+$$\frac{R//(-\frac{j}{\omega c})}{[(R//(-\frac{j}{\omega c})+R-\frac{j}{\omega c})]} U_i=U_o$$
+化简得：
+$$U_o=U_i[(3(R\omega c)^2/(R\omega c)^4+7(R\omega c)^2+1+j((R\omega c)^3-R\omega c)/(R\omega c)^4+7(R\omega c)^2+1$$
+欲使输出电压Uo和输入电压Ui同相，应满足：
+$RWC=1$
+即频率$\omega=1/RC=1591.55 rad/s$
+此时，输出电压与输入电压的比值为：
+$$U_o/U_i = 3(R\omega c)^2/(R\omega c)^4+7(R\omega c)^2+1 = 1/3$$
+下面用仿真电路进行验证，仿真电路如下：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=8cm]{3_1.png}
+	\caption{文氏电桥仿真电路}
+\end{figure}
+示波器给出的波形如下：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm,height=8cm]{3_1_1.png}
+	\caption{文氏电桥仿真结果}
+\end{figure}
+从上图可见，输出电压与输入电压同相，并且输出电压为输入电压的1/3，实现了文氏电桥电路。
+
+2.	同相比例放大器（应改进输入！！！）
+由运算放大器性质，可得$u_o=(1+R_2/R_1)u_i$，且满足同相关系。
+欲使电压放大倍数为3，则$R_2$应取为$R_1$的2倍。结合$R_1//R_2=R_3$可得
+$R_1=15K\Omega,R_2=30K\Omega$
+仿真电路图如下图所示：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=13cm,height=8cm]{3_2_1.png}
+	\caption{同相比例放大器仿真电路}
+\end{figure}
+仿真结果如下图所示：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=9cm]{3_2_2.png}
+	\caption{同相比例放大器仿真结果}
+\end{figure}
+当输入交流电压为U=1V时（满足运放工作在线性区），输出电压为输入电压的3倍，实现了同相比例放大器。
+
+3.	正弦波发生器
+
+（1）	为什么第2部分需要设计放大倍数为3的同相比例放大器？
+
+在上图所示电路中，A点电压经过同相比例放大器放大为B点电压，设放大倍数为A,即$U_A=AU_B$。B点电压经过文氏电桥反馈到A点，即$U_B=FU_A$。
+对于某个频率的正弦波，电路应满足平衡条件$AF=1$。根据1中所得文氏电桥输入输出的关系得F=1/3，得到A=3.所以电压放大倍数应为3.
+
+（2）	仿真电路图如下图所示
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=13cm,height=10cm]{3_3_1.png}
+	\caption{正弦波发生器仿真电路}
+\end{figure}
+为了满足起振条件，图中将$R_2$略微增大，以得到失真比较小的正弦波。
+
+（3）	示波器波形如下图所示，已用游标标明相邻两峰值的游标。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=8cm]{3_3_2.png}
+	\caption{正弦波发生器仿真结果}
+\end{figure}
+从图中可以看出，正弦波峰值$U_m=9.26V$,周期$T=629\mu s$  
+
+（4）	2倍频率正弦波
+
+电路中文氏电桥只需满足$R\omega C=1$即可实现产生正弦波。因此，将RC乘积减小至1/2，便可以使得产生的正弦波频率增大为2倍。
+仿真电路如下图所示：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=10cm]{3_3_4.png}
+	\caption{2倍频正弦波发生器仿真电路}
+\end{figure}
+仿真结果如下图所示：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=9cm]{3_3_3.png}
+	\caption{正弦波发生器仿真结果}
+\end{figure}
+游标显示峰值Um=,周期T=
+
+因此在误差范围内实现了2倍频率正弦波的产生。
+
+二、	电容倍增器
+
+（1）	该电路可以实现电容倍增功能的原因：
+
+结合运放的性质，可得：
+$$I=jwcU_c$$
+$$U/R_1 (R_1+R_2)=U_c$$
+计算可得，端口电压-电流关系为：
+$$I=jw(1+R_2/R_1)CU$$
+等效电容为：
+$$C^’=(1+R_2/R_1)C$$
+幅值关系为：
+$$U/I=w(1+R_2/R_1)C$$
+所以实现了电容倍增。
+（2）	仿真电路如下图所示：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=9cm]{3_4_1.png}
+	\caption{电容倍增器仿真电路}
+\end{figure}
+由（1）计算结果，可得：$C=10nF，f=1kHz$时，要得到等效电感$C=0.11\mu F，R1、R2、C$应满足：
+取$R_1=0.1k\Omega，R_2=1k\Omega$ 进行电路仿真。
+
+示波器显示的电压-电流波形如下图所示
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=8cm]{3_4_1.png}
+	\caption{电容倍增器仿真结果}
+\end{figure}
+从波形图中可以发现，端口电流相位领先电压$\pi/2$,呈现“容性”。
+幅值比例为：
+
+仿真结果与理论计算值相近，电路达到设计要求，成功验证了电容倍增器。
+
+进一步讨论电容倍增器正常工作的端口电压范围：
+
+
+三、	虚拟电感
+（1）	从图中可以看出，电路中间串联以及电路右侧并联的含运放的电路是“负电阻电路”。结合运放的性质，计算可得，该负电阻网络的等效电阻为-R。
+其等效电路为：（应画出等效电路）
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm,height=5cm]{3_5_3.png}
+	\caption{模拟电感等效电路}
+\end{figure}
+根据相量形式的导纳串并联关系，可得等效导纳：
+$$G=（-1/R+jwc）//(-1/R)+1/R$$
+计算得输入端口看入的等效阻抗为：
+$$Z=1/G=-(2R+jwcR^2)$$
+即U=ZI
+结果中纯虚数部分电压领先电流pi/2,表现为感性，且该电路等效电感为：
+$$ L=wcR^2 $$
+幅值关系：
+$$U/I=sqrt(4R^2+(R^2wc)^2$$
+（2）	仿真电路如下图所示
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=14cm,height=10cm]{3_5_1.png}
+	\caption{模拟电感仿真电路}
+\end{figure}
+由（1）计算结果，可得$$L=0.1H，f=5kHz$$时，$R、C$应满足$R^2C=0.1$：
+取$R=1K\Omega，C=0.1\mu F$进行电路仿真。
+示波器给出的端口电压电流波形如下图：
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=15cm,height=8cm]{3_5_2.png}
+	\caption{模拟电感仿真结果}
+\end{figure}
+从图中可以看出，电压电流的交流成分中，电压相位领先电流$\pi/2$，呈现感性。
+
+幅值比例为：
+
+仿真结果与理论计算值相近，电路达到设计要求，成功验证了模拟电感。
+
+进一步讨论模拟电感正常工作的端口电压范围：
+}
+\end{document}
