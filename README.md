@@ -14,7 +14,7 @@ Undergraduate Projects in THU-CST (Department of Computer Science & Technology)
 |2019.2-2019.6|AI推送|AI分领域综述|
 |2019.6-2019.8|程序设计训练|DMFB、国际象棋、体育新闻网站大作业|
 |2019.6-2019.8|NLP相关|Word2vec(python)、language model(LSTM)|
-|2019.9-2020.1|数据结构|---|
+|2019.9-2020.1|数据结构|OJ报告|
 |2019.9-2020.1|Python程序设计|微博舆情分析系统大作业|
 |2019.9-2020.1|物理实验B(1)|实验报告(latex)|
 |2019.9-2020.1|电子学基础实验|实验报告(latex)|
