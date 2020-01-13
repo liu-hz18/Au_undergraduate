@@ -11,7 +11,7 @@ Undergraduate Projects in THU-CST (Department of Computer Science & Technology)
 |2019.2-2019.6|离散数学(2)|---|
 |2019.2-2019.6|电路原理|正弦波发生器、傅里叶合成等实验|
 |2019.2-2019.6|THU-AI挑战赛|AStar、Qt|
-|2019.2-2019.6|AI推送|AI分领域综述|
+|2019.2-2019.6|AI推送|AI分领域综述、SVM|
 |2019.6-2019.8|程序设计训练|DMFB、国际象棋、体育新闻网站大作业|
 |2019.6-2019.8|NLP相关|Word2vec(python)、language model(LSTM)|
 |2019.9-2020.1|数据结构|OJ报告|
