@@ -1,0 +1,22 @@
+<RCC>
+    <qresource prefix="/image">
+        <file>icons/back_1.jpg</file>
+        <file>icons/background.jpg</file>
+        <file>icons/begin.png</file>
+        <file>icons/broom_off.png</file>
+        <file>icons/broom_on.png</file>
+        <file>icons/Music-icon.png</file>
+        <file>icons/Music-off-icon.png</file>
+        <file>icons/next.jpg</file>
+        <file>icons/openfile.jpg</file>
+        <file>icons/reset_1.jpg</file>
+        <file>icons/set_background.jpeg</file>
+        <file>icons/set_background.jpg</file>
+        <file>icons/settable.png</file>
+        <file>icons/stop.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>BioChip.qml</file>
+        <file>BioChipForm.ui.qml</file>
+    </qresource>
+</RCC>
