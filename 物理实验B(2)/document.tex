@@ -1,0 +1,165 @@
+\documentclass[UTF8]{article}
+\usepackage{CTEX}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\geometry{left=3.0cm,right=3.0cm,top=2.0cm,bottom=3.0cm}
+
+\begin{document}
+{
+	热电子发射的里查孙-德西曼公式:
+	$$J_e = 2(1-R_e)A_1T^2e^{-(W_a-W_i)/kT}$$
+	式中$J_e$为单位面积的发射电流，$W_a-W_i=e_0\phi$为该金属的逸出功，单位常用eV(电子伏特)表示,$\phi$为逸出电位,$A_1=60.09A/(cm\cdot K)^2$为普适常数,$R_e$为金属表面对发射电子的反射系数。
+	若令$2(1-R_e)A_1 = A$,则
+	$$J_e = AT^2e^{-e_0\phi/kT}$$
+	于是发射电流公式为:$$I_e = AST^2e^{-e_0\phi/kT}$$
+	其中S为阴极金属的有效发射面积。
+	
+	物理量$A$直接与金属表面对发射系数$R_e$有关;$R_e$与金属表面的化学纯度有很大关系，其数值决定于位能壁垒。如果金属表面处理不够洁净，电子管内真空度又不够高，则所得的$R_e$值就有很大差别，直接影响到$A$值。其次由于金属表面是粗糙的，计算出的阴极发射面积与实际的有效面积$S$也可能有差异，因此，$A$和$S$由于实际的各种原因而难以测量，甚至无法测量。
+	
+	
+	为此，可对上面的公式进行适当处理，使得$\lg{\frac{I_e}{T^2}}$与$\frac{1}{T}$成线性关系。若以$\lg{\frac{I_e}{T^2}}$与$\frac{1}{T}$作为横纵坐标，则由直线斜率可以得到$\phi$的大小，此方法称为里查孙直线法。处理后的公式如下:
+	$$\lg{\frac{I_e}{T^2}} = \lg(AS) - 5.039\times10^3\frac{\phi}{T}$$
+	在$\lg{\frac{I_e}{T^2}}-\frac{1}{T}$曲线上，由直线斜率可以求出$\phi$
+	
+	为消除空间电荷对后续电子的阻碍，需要外加电场$E_\alpha$,外加电场的粗子啊产生肖特基效应，此时有
+	$$I_e' = I_e e^{4.39\sqrt{E_\alpha}/T}$$
+	在一般情况下，外加电压$U_a>>U_a'$。把阳极做成圆柱形，并于阴极共轴，忽略接触电位差,有
+	$$\lg I_e' = \lg I_e + \frac{4.39}{2.303T}\frac{1}{\sqrt{r_1\ln(r_2/r_1)}}\sqrt{U_a}$$
+	由此可见，在阴极温度一定的情况下，$\lg I_e'$和$\sqrt{U_a}$成线性关系。可以画出在不同阴极温度下的$\lg I_e'$与$\sqrt{U_a}$的关系曲线，并将其外推至$\sqrt{U_a}=0$处，此时的$\lg I_e'$即为$\lg I_e$,由此可以定出所需要的$I_e$值。
+	
+	
+	本实验是通过测量阴极加热电流来确定阴极温度。对于纯钨丝，一定的比加热电流$I_1$与阴极温度的关系已有前人精确地测算出了，并列成表。(加热电流与阴极温度的关系并不是一成不变的。它与阴极材料的纯度有关，管子的结构情况也影响阴极的热辐射.)
+	$$I_1 = \frac{I_f}{d_K^{3/2}}$$
+	其中$I_f$为阴极加热电流，$d_K$为阴极钨丝直径。可以由阴极电流的大小得出比加热电流的大小，从而查表得出对应的温度$T$。
+	
+	其中,$R_1=R_2=18k\Omega, R_4=1M\Omega, R_5 = 1k\Omega, R_{e1} = 2.7k\Omega, R_{e2}=300\Omega$
+	
+	2. 利用\textbf{Matlab}对测量数据作线性拟合，对$\lg I_e'-\sqrt{U_a}$进行线性拟合,得
+	
+	3. 对$\lg(U_e/T^2)-1/T$进行线性拟合，得
+	
+	4. 计算$\phi$
+	由$\lg\frac{I_e}{T^2} = \lg(AS) - 5.039\times10^3\frac{\phi}{T}$得
+	$$\lg\frac{U_e}{T^2} = \lg\frac{I_eR}{T^2} = \lg(AS) + \lg R - 5039\frac{\phi}{T}$$
+	故$\lg\frac{U_e}{T^2}-\frac{1}{T}$的直线斜率为
+	$$k = -5039\phi$$
+	故
+	$$\phi = \frac{-k}{5039} = \frac{22853.5}{5039} = V$$
+	故逸出功为
+	$$W = e\phi = eV$$
+	
+	/*********************************************/
+	
+	$$T = \frac{I_T}{I_0}$$
+	$$T_i = \frac{I_2}{I_1}$$
+	$$T_i = e^{-\alpha d}$$
+	
+	\begin{equation}
+	\begin{aligned}
+	I_T &= T_{T1} + T_{T2} + T_{T3}+\cdots\\ &= I_0(1-R)^2e^{-\alpha d} + I_0(1-R)^2R^2e^{-3\alpha d}+I_0(1-R)^2R^4e^{-5\alpha d}+\cdots\\ &= \frac{I_0(1-R)^2e^{-\alpha d}}{1-R^2e^{-2\alpha d}}
+	\end{aligned}
+	\end{equation}
+	
+	$$T = \frac{I_T}{I_0} = \frac{I_0(1-R)^2e^{-\alpha d}}{1-R^2e^{-2\alpha d}}$$
+	
+	$$\frac{T_2}{T_1} = \frac{e^{-\alpha d_2}(1-R^2e^{-2\alpha d_1})}{e^{-\alpha d_1}(1-R^2e^{-2\alpha d_2})}$$
+	$$\frac{T_2}{T_1} = e^{-\alpha(d_2-d_1)}$$
+	$$\alpha = \frac{\ln T_1 - \ln T_2}{d_2 - d_1}$$
+	$$T_i = \frac{T_2}{T_1}$$
+	
+	$$T_i = \frac{n_2}{n_1}$$
+	$$\alpha = \frac{\ln n_1 - \ln n_2}{d_2 - d_1}$$
+	\\\\\\
+	$$\frac{1}{x} + \frac{1}{a} = \frac{1}{f}$$
+	$$\frac{a}{b} = \frac{d}{D}$$
+	计算得:
+	$$a = 180mm$$
+	$$x = 90mm$$
+	
+	$$\alpha = \frac{\ln n_1 - \ln n_2}{d_2-d_1} = \frac{\ln n_1 - \ln n_2}{3mm}$$
+	
+	/****************************************************/
+	
+	
+	等效电路总阻抗$Z = U_p/I$,等效电路的总导纳为:
+	$$Y = \frac{I}{U_p} = y_0+y_1 = j\omega C_0 + \left(R_1 + j\left(\omega L - \frac{1}{\omega C}\right)^{-1}\right)$$
+	$$y_0 = jb_0 = j\omega C_0\qquad y_1 = g_1 + b_1 = \left(R_1 + j\left(\omega L - \frac{1}{\omega C}\right)^{-1}\right)$$
+	$$g_1 = \frac{R_1}{R_1^2 + (\omega L - 1/(\omega C))^2}\qquad b_1 = -\frac{\omega L - 1/(\omega C)}{R_1^2 + (\omega L - 1/(\omega C))^2}$$
+	其中$\omega C_0 = b_0$为静态导纳，$\omega$为角频率，若记$r = 1/(2R_0), b_0 = \omega C_0$得:
+	$$(g_1 - r) + b_1^2 = r^2$$
+	分别以$g_1, jb_1$为横、纵坐标轴，当频率改变时，$y_1$是圆心在$(r, 0)$点、半径为$r$，直径为$D$的圆，由于测量过程中$\omega$的变化小于$\pm1\%$,可近似看作常数。所以$Y=y_0+y_1$也是一个圆，称为导纳圆，圆与纵轴相切.
+	
+	
+	当$b = b_0 = \omega C_0$时$\omega L - 1/(\omega C) = 0$, 圆方程的解只有$g=0$或$g=2r=1/R_1$，而压电元件总要辐射能量，$g\neq0$，所以只有$g=1/R_1$存在，这时即$\omega = \omega_s = 1/\sqrt{LC}$。因此图上$(1/R_1，0)$点的频率即是$\omega_s$，称为串联共振频率或机械共振频率。
+	
+	过圆心O作平行于电纳轴的线交圆于$\omega_1, \omega_2$,可得到
+	$$L = \frac{R_1}{\omega_2 - \omega_1}\qquad C_1 = \frac{1}{\omega_1\omega_2L} = \frac{1}{\omega_s^2L}\qquad C_0\approx\frac{b_0}{\omega_s}$$
+	品质因数$$Q_m = \frac{\omega_s L_1}{R_1} = \frac{1}{\omega_s C_1 R_1} = \frac{1}{R_1}\sqrt{\frac{L_1}{C_1}}$$
+	
+	$$g = \frac{U_1}{UR}\cos\phi = \frac{U_1}{UR}\cos\frac{2\pi\tau}{T}\qquad b = \frac{U_1}{UR}\sin\phi = \frac{U_1}{UR}\sin\frac{2\pi\tau}{T}$$
+	上式中，$U_1$是示波器测得的电压振幅，$\tau$是两信号的时间差。
+	由于测量时，加入了小采样电阻，所以$L_1,D,C_0$要修改为
+	$$L_1 = \frac{R_1+R}{\omega_2-\omega_1}\qquad C_0\approx\frac{\bar{A}\bar{C}}{\omega_s}(1+\frac{R}{R_1})\qquad R_1+R =\frac{1}{D}$$
+	
+	$$u_1 = R_1i_1 + L_1\frac{di_1}{dt} - M\frac{di_2}{dt} - M\frac{di_1}{dt} + L_2\frac{di_2}{dt} + R_2i_2 = 0$$
+	
+	设$\dot{U} = |U|\angle\phi_U, \dot{I} = |I|\angle\phi_{UI}, \dot{Y} = |Y|\angle\phi_Y$,则
+	$$\dot{Y} = \frac{\dot{I}}{\dot{U}} = \frac{|I|}{|U|}\angle(\phi_{UI} - \phi_U)$$
+	故
+	$$\phi_Y = \phi_{UI} - \phi_U$$
+	由$\phi_Y = \frac{2\pi\tau}{T}$知
+	$$\tau = \frac{T}{2\pi}(\phi_{UI} - \phi_U)$$
+	
+	/****数据处理****/
+	
+	计算$R_1, L_1, C_1, Q_m:$
+	由于$R_1+R = 1/D$，且$D= ms, R= \Omega, \omega_s = kHz$,故
+	$$R_1 = \frac{1}{D} - R = \frac{1}{23.404\times10^{-3}} -3.08 = \Omega $$
+	而
+	$$L_1 = \frac{R_1+R}{\omega_2-\omega_1} = \frac{1}{2\pi D(f_2-f_1)}$$
+	其中$f_1 = kHz, f_2 =  kHz$,故
+	$$L_1 = \frac{1}{2\pi D(f_2-f_1)} = \frac{1}{test} = H$$
+	$$C_1 = \frac{1}{\omega_1\omega_2L} = \frac{1}{4\pi^2f_1f_2L_1} = \frac{1}{test} = F = pF$$
+	由$\overline{AC} = mS$得
+	$$C_0 = \frac{\overline{AC}}{\omega_s}(1+\frac{R}{R_1}) = F = pF$$
+	品质因数
+	$$Q = \frac{1}{R_1}\sqrt{\frac{L_1}{C_1}} = $$
+	综上
+	$$R_1 = \Omega,L_1 = mH, C_1 = pF, C_0 = pF, Q_m = $$
+	
+	
+	在图中观察到$\triangle R_{1max} = \Omega$
+	$$\triangle R_{1max} = \frac{2\pi fM^2}{2L_2} = \Omega$$
+	相对偏差$\delta = \frac{19-14}{14}\times100\% = \%$
+	
+	
+	/****************************************/
+	$$e = \frac{T_2}{T_1}$$
+	
+	$$\delta_r = \frac{2\pi (n_s - n_f)d}{\lambda_0} = \frac{\omega(n_s-n_f)d}{c}$$
+	
+	
+	/**************************************/
+	
+	$$\triangle = 2d\cos\phi = k\lambda$$
+	$$2d(1-\frac{D^2}{8f^2}) = k\lambda$$
+	$$\triangle D^2 = D_{k+1}^2 - D_k^2 = \frac{4\lambda f^2}{d}$$
+	$$\triangle \lambda_{ab} = \frac{\lambda^2}{2d} = \frac{D_b^2 - D_b^2}{D_{k-1}^2 - D_k^2}$$
+	$$\triangle \tilde{\upsilon} = \widetilde{\upsilon_b} - \widetilde{\upsilon_a} = \frac{\triangle D_{ab}^2}{2d\triangle D^2}$$
+	$$\triangle = 2nd\cos\phi = k\lambda$$
+	
+	$$-2nd\sin\phi\triangle\phi = \triangle k\lambda$$
+	$$\phi_k - \phi_{k+1} = -\triangle\phi \approx\frac{\lambda}{2nd\sin\phi}$$
+	
+	$$\triangle \tilde{\upsilon} = \widetilde{\upsilon_b} - \widetilde{\upsilon_a} = \frac{D_b^2 - D_b^2}{2d(D_{k-1}^2 - D_k^2)}$$
+	$$\triangle \tilde{\upsilon} = (7-3)\frac{L}{2} = 2L$$
+	由$D_{k,7}, D_{k-1,3}, D_{k-1,7}$算出$\triangle \tilde{\upsilon}$,得到$L$,带入$L = 0.467B$即得$B$
+	
+	$$\overline{B} = \frac{\sum_{i=1}^{5}B_i}{5} = T$$
+	
+}
+\end{document}
