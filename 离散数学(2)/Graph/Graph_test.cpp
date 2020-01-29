@@ -7,9 +7,9 @@ int main(){
 	int n, m;
 	scanf("%d%d", &n, &m);
 	//无向图
-	//Graph* G = new Graph(n, /*isDirect =*/ false);
+	Graph* G = new Graph(n, /*isDirect =*/ false);
 	//有向图
-	Graph* G = new Graph(n, /*isDirect =*/ true);
+	//Graph* G = new Graph(n, /*isDirect =*/ true);
 	int f, t, w;
 	
 	//手动加边
@@ -44,9 +44,11 @@ int main(){
 	//G->getCloseCet(/*hasNegEdge =*/ false);
 
 	//prim 测试
-	//list<Edge>* treeList = new list<Edge>;
-	//printf("%d\n", G->primBrute(/*root =*/ 0, treeList));
-	//G->printVetex();
+	list<Edge>* treeList = new list<Edge>;
+	printf("%d\n", G->primBrute(/*root =*/ 0, treeList));
+	G->printVetex();
+	G->printEdge();
+	G->printSpanningTree();
 
 	//treeList->clear();
 	//printf("%d\n", G->primHeap(/*root =*/ 0, treeList));

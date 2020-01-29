@@ -41,3 +41,24 @@ void Graph::printVetex(){
 	}
 	putchar(10);
 }
+
+//打印边信息(可以用于输出支撑树结构)
+void Graph::printEdge(){
+	for(int i = 0; i < n; i++){
+		for(list<Edge>::iterator it = edgeList[i].begin(); it != edgeList[i].end(); it++){
+			printf("Edge(%d, %d): weight:%d Type:", i, it->to, it->weight);
+			if(it->edgeType == UNETERMINED)printf("UNETERMINED\n");
+			else if(it->edgeType == TREE)printf("TREE\n");
+			else if(it->edgeType == CROSS)printf("FORWARD\n");
+			else if(it->edgeType == BACKWARD)printf("BACKWARD\n");
+		}
+	}
+	putchar(10);
+}
+
+//输出最小支撑树树边
+void Graph::printSpanningTree(){
+	for(int i = 0; i < n; i++){
+		printf("TREE EDGE:(%d, %d)\n", vertex[i].parent, i);
+	}
+}

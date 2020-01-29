@@ -51,6 +51,10 @@ public:
 	bool existEdge(int f, int t);//(f, t)存在边,O(n)
 
 	void printVetex();//打印顶点信息
+	
+	void printEdge();//打印边信息
+
+	void printSpanningTree();//输出最小支撑树的树边
 
 	void randomGraph(int _e, int w_max = 1);//对n个顶点的图随机插入e条正权边, 无重边和自环, 有正整数权重
 	
