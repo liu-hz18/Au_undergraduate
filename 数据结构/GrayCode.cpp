@@ -12,7 +12,7 @@ unsigned long long num2Gray(unsigned long long k){
 //格雷码转数字
 unsigned long long gray2Num(unsigned long long k){
 	unsigned long long n = 0;
-	for(; k; g >>= 1)n ^= g;
+	for(; g; g >>= 1)n ^= g;
 	return n;
 }
 
