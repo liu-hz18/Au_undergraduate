@@ -15,24 +15,13 @@ inline int min(int a, int b){return a > b ? b : a;}
 inline void swap(int& a, int& b){int temp = a; a = b; b = temp;}
 inline int dice(int n){return rand() % n;}
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
-
-#include <vector>
-
-using namespace std;
-
-//¾¡Á¿Ê¹ÓÃC++11ÌØĞÔ£¡£¡£¡
-//BÊ÷½Úµã
+//å°½é‡ä½¿ç”¨C++11ç‰¹æ€§ï¼ï¼ï¼
+//Bæ ‘èŠ‚ç‚¹
 template<typename T> struct BTNode{
-	BTNode<T>* parent;//¸¸½Úµã
-	vector<T> key;//¹Ø¼üÂëÏòÁ¿
-	vector< BTNode<T>* > child;//º¢×ÓÏòÁ¿£¨Æä³¤¶È×Ü±Èkey¶àÒ»£©
-	BTNode(): parent(NULL){//BTNodeÖ»ÄÜ×÷Îª¸ù½Úµã´´½¨£¬¶øÇÒ³õÊ¼Ê±ÓĞ0¸ö¹Ø¼üÂëºÍ1¸ö¿Õº¢×ÓÖ¸Õë
+	BTNode<T>* parent;//çˆ¶èŠ‚ç‚¹
+	vector<T> key;//å…³é”®ç å‘é‡
+	vector< BTNode<T>* > child;//å­©å­å‘é‡ï¼ˆå…¶é•¿åº¦æ€»æ¯”keyå¤šä¸€ï¼‰
+	BTNode(): parent(NULL){//BTNodeåªèƒ½ä½œä¸ºæ ¹èŠ‚ç‚¹åˆ›å»ºï¼Œè€Œä¸”åˆå§‹æ—¶æœ‰0ä¸ªå…³é”®ç å’Œ1ä¸ªç©ºå­©å­æŒ‡é’ˆ
 		child.insert(0, NULL);
 	}
 	BTNode(T e, BTNode<T>* lc = NULL, BTNode<T>* rc = NULL){
@@ -45,7 +34,7 @@ template<typename T> struct BTNode{
 	}
 };
 
-//BÊ÷
+//Bæ ‘
 template<typename T> class BTree{
 protected:
 	int _size;
@@ -62,23 +51,23 @@ public:
 	~BTree(){
 		//if(_root)release(_root);
 	}
-	int order()const{return _order;}//BÊ÷½×Êı
+	int order()const{return _order;}//Bæ ‘é˜¶æ•°
 	int size()const{return _size;}
 	BTNode<T>*& root(){return _root;}
 	bool empty()const{return !root;}
-	BTNode<T>* search(const T& e);//²éÕÒ
-	bool insert(const T& e);//²åÈë
-	bool remove(const T& e);//É¾³ı
+	BTNode<T>* search(const T& e);//æŸ¥æ‰¾
+	bool insert(const T& e);//æ’å…¥
+	bool remove(const T& e);//åˆ é™¤
 };
 
 template<typename T>
 BTNode<T>* BTree<T>::search(const T& e){
-	BTNode<T>* v = _root, _hot = NULL;//´Ó¸ù½Úµã³ö·¢
+	BTNode<T>* v = _root, _hot = NULL;//ä»æ ¹èŠ‚ç‚¹å‡ºå‘
 	while(v){
-		int r = v->key.search(e);//ÔÚµ±Ç°½ÚµãÖĞ£¬ÕÒµ½²»´óÓÚeµÄ×î´ó¹Ø¼üÂë
-		if(0 <= r && e == v->key[r])return v;//³É¹¦£ºÔÚµ±Ç°½ÚµãÖĞÃüÖĞÄ¿±ê¹Ø¼üÂë
+		int r = v->key.search(e);//åœ¨å½“å‰èŠ‚ç‚¹ä¸­ï¼Œæ‰¾åˆ°ä¸å¤§äºeçš„æœ€å¤§å…³é”®ç 
+		if(0 <= r && e == v->key[r])return v;//æˆåŠŸï¼šåœ¨å½“å‰èŠ‚ç‚¹ä¸­å‘½ä¸­ç›®æ ‡å…³é”®ç 
 		_hot = v;
-		v = v->child[r+1];//·ñÔò£¬×ªÈë¶ÔÓ¦×ÓÊ÷£¨_hotÖ¸ÏòÆä¸¸£©¡ª¡ª Ğè×öI/O£¬×î·ÑÊ±¼ä
+		v = v->child[r+1];//å¦åˆ™ï¼Œè½¬å…¥å¯¹åº”å­æ ‘ï¼ˆ_hotæŒ‡å‘å…¶çˆ¶ï¼‰â€”â€” éœ€åšI/Oï¼Œæœ€è´¹æ—¶é—´
 	}
 	return NULL;
 }
@@ -86,147 +75,147 @@ BTNode<T>* BTree<T>::search(const T& e){
 template<typename T>
 bool BTree<T>::remove(const T& e){
 	BTNode<T>* v = search(e);
-	if(!v)return false;//È·ÈÏÄ¿±ê½Úµã²»´æÔÚ
-	int r = v->key.search(e);//È·¶¨Ä¿±ê¹Ø¼üÂëÔÚ½ÚµãvÖĞµÄÖÈ
-	if(v->child[0]){//Èôv·ÇÒ¶×Ó£¬ÔòeµÄºó¼Ì±ØÊôÓÚÄ³Ò¶½Úµã
-		BTNode<T>* u = v->child[r+1];//ÔÚÓÒ×ÓÊ÷ÖĞÒ»Ö±Ïò×ó£¬¼´¿É
-		while(u->child[0])u = u->child[0];//ÕÒ³öeµÄºó¼Ì
-		v->key[r] = u->key[0];//²¢ÓëÖ® ½»»»Î»ÖÃ
+	if(!v)return false;//ç¡®è®¤ç›®æ ‡èŠ‚ç‚¹ä¸å­˜åœ¨
+	int r = v->key.search(e);//ç¡®å®šç›®æ ‡å…³é”®ç åœ¨èŠ‚ç‚¹vä¸­çš„ç§©
+	if(v->child[0]){//è‹¥véå¶å­ï¼Œåˆ™eçš„åç»§å¿…å±äºæŸå¶èŠ‚ç‚¹
+		BTNode<T>* u = v->child[r+1];//åœ¨å³å­æ ‘ä¸­ä¸€ç›´å‘å·¦ï¼Œå³å¯
+		while(u->child[0])u = u->child[0];//æ‰¾å‡ºeçš„åç»§
+		v->key[r] = u->key[0];//å¹¶ä¸ä¹‹ äº¤æ¢ä½ç½®
 		v = u;
 		r = 0;
-	}//ÖÁ´Ë£¬v±ØÈ»Î»ÓÚ×îµ×²ã£¬ÇÒÆäÖĞµÚr¸ö¹Ø¼üÂë¾ÍÊÇ´ıÉ¾³ıÕß
+	}//è‡³æ­¤ï¼Œvå¿…ç„¶ä½äºæœ€åº•å±‚ï¼Œä¸”å…¶ä¸­ç¬¬rä¸ªå…³é”®ç å°±æ˜¯å¾…åˆ é™¤è€…
 	v->key.remove(r);
-	v->child.remove(r+1);//É¾³ıe£¬ÒÔ¼°ÆäÏÂ Á½¸öÍâ²¿½ÚµãÖ®Ò»
+	v->child.remove(r+1);//åˆ é™¤eï¼Œä»¥åŠå…¶ä¸‹ ä¸¤ä¸ªå¤–éƒ¨èŠ‚ç‚¹ä¹‹ä¸€
 	_size--;
-	solveUnderFlow(v);//ÈçÓĞ±ØÒª£¬Ğè×öĞı×ª»òºÏ²¢
+	solveUnderFlow(v);//å¦‚æœ‰å¿…è¦ï¼Œéœ€åšæ—‹è½¬æˆ–åˆå¹¶
 	return true;
 }
 
 template <typename T> 
-bool BTree<T>::insert ( const T& e ) { //½«¹Ø¼üÂëe²åÈëBÊ÷ÖĞ
+bool BTree<T>::insert ( const T& e ) { //å°†å…³é”®ç eæ’å…¥Bæ ‘ä¸­
 	BTNode<T>* v = search(e); 
-	if(v) return false; //È·ÈÏÄ¿±ê½Úµã²»´æÔÚ
-	int r = _hot->key.search(e); //ÔÚ½Úµã_hotµÄÓĞĞò¹Ø¼üÂëÏòÁ¿ÖĞ²éÕÒºÏÊÊµÄ²åÈëÎ»ÖÃ
-	_hot->key.insert(r + 1, e); //½«ĞÂ¹Ø¼üÂë²åÖÁ¶ÔÓ¦µÄÎ»ÖÃ
-	_hot->child.insert(r + 2, NULL); //´´½¨Ò»¸ö¿Õ×ÓÊ÷Ö¸Õë
-	_size++; //¸üĞÂÈ«Ê÷¹æÄ£
-	solveOverFlow(_hot); //ÈçÓĞ±ØÒª£¬Ğè×ö·ÖÁÑ
-	return true; //²åÈë³É¹¦
+	if(v) return false; //ç¡®è®¤ç›®æ ‡èŠ‚ç‚¹ä¸å­˜åœ¨
+	int r = _hot->key.search(e); //åœ¨èŠ‚ç‚¹_hotçš„æœ‰åºå…³é”®ç å‘é‡ä¸­æŸ¥æ‰¾åˆé€‚çš„æ’å…¥ä½ç½®
+	_hot->key.insert(r + 1, e); //å°†æ–°å…³é”®ç æ’è‡³å¯¹åº”çš„ä½ç½®
+	_hot->child.insert(r + 2, NULL); //åˆ›å»ºä¸€ä¸ªç©ºå­æ ‘æŒ‡é’ˆ
+	_size++; //æ›´æ–°å…¨æ ‘è§„æ¨¡
+	solveOverFlow(_hot); //å¦‚æœ‰å¿…è¦ï¼Œéœ€åšåˆ†è£‚
+	return true; //æ’å…¥æˆåŠŸ
 }
 
-template <typename T> //¹Ø¼üÂë²åÈëºóÈô½ÚµãÉÏÒç£¬Ôò×ö½Úµã·ÖÁÑ´¦Àí
+template <typename T> //å…³é”®ç æ’å…¥åè‹¥èŠ‚ç‚¹ä¸Šæº¢ï¼Œåˆ™åšèŠ‚ç‚¹åˆ†è£‚å¤„ç†
 void BTree<T>::solveOverFlow(BTNode<T>* v){
-	if( _order >= v->child.size()) return; //µİ¹é»ù£ºµ±Ç°½Úµã²¢Î´ÉÏÒç
-	int s = _order / 2; //Öáµã£¨´ËÊ±Ó¦ÓĞ_order = key.size() = child.size() - 1£©
-	//Ö»ĞèÒªĞÂ´´½¨Ò»¸öĞÂ½Úµã£¬ÒòÎªÖĞ¼ä½ÚµãÉÏÒÆ£¬×óÓÒÁ½½ÚµãÆäÖĞÒ»¸öÊÇÔ­À´µÄ½Úµã£¬ÁíÒ»¸öĞÖµÜÊÇĞÂ´´½¨µÄ
-	BTNode<T>* u = new BTNode<T>(); //×¢Òâ£ºĞÂ½ÚµãÒÑÓĞÒ»¸ö¿Õº¢×Ó
-	for(int j = 0; j < _order - s - 1; j++) { //vÓÒ²à_order-s-1¸öº¢×Ó ¼° ¹Ø¼üÂë ·ÖÁÑÎªÓÒ²à½Úµãu
-		u->child.insert(j, v->child.remove(s + 1) ); //Öğ¸öÒÆ¶¯Ğ§ÂÊµÍ
-		u->key.insert(j, v->key.remove(s + 1)); //´Ë²ßÂÔ¿É¸Ä½ø
+	if( _order >= v->child.size()) return; //é€’å½’åŸºï¼šå½“å‰èŠ‚ç‚¹å¹¶æœªä¸Šæº¢
+	int s = _order / 2; //è½´ç‚¹ï¼ˆæ­¤æ—¶åº”æœ‰_order = key.size() = child.size() - 1ï¼‰
+	//åªéœ€è¦æ–°åˆ›å»ºä¸€ä¸ªæ–°èŠ‚ç‚¹ï¼Œå› ä¸ºä¸­é—´èŠ‚ç‚¹ä¸Šç§»ï¼Œå·¦å³ä¸¤èŠ‚ç‚¹å…¶ä¸­ä¸€ä¸ªæ˜¯åŸæ¥çš„èŠ‚ç‚¹ï¼Œå¦ä¸€ä¸ªå…„å¼Ÿæ˜¯æ–°åˆ›å»ºçš„
+	BTNode<T>* u = new BTNode<T>(); //æ³¨æ„ï¼šæ–°èŠ‚ç‚¹å·²æœ‰ä¸€ä¸ªç©ºå­©å­
+	for(int j = 0; j < _order - s - 1; j++) { //vå³ä¾§_order-s-1ä¸ªå­©å­ åŠ å…³é”®ç  åˆ†è£‚ä¸ºå³ä¾§èŠ‚ç‚¹u
+		u->child.insert(j, v->child.remove(s + 1) ); //é€ä¸ªç§»åŠ¨æ•ˆç‡ä½
+		u->key.insert(j, v->key.remove(s + 1)); //æ­¤ç­–ç•¥å¯æ”¹è¿›
 	}
-	u->child[_order - s - 1] = v->child.remove(s + 1);//ÒÆ¶¯v×î¿¿ÓÒµÄº¢×Ó
-	if(u->child[0]){//ÈôuµÄº¢×ÓÃÇ·Ç¿Õ£¬Ôò
-		for(int j = 0; j < _order - s; j++) //ÁîËüÃÇµÄ¸¸½ÚµãÍ³Ò»
-			u->child[j]->parent = u; //Ö¸Ïòu
+	u->child[_order - s - 1] = v->child.remove(s + 1);//ç§»åŠ¨væœ€é å³çš„å­©å­
+	if(u->child[0]){//è‹¥uçš„å­©å­ä»¬éç©ºï¼Œåˆ™
+		for(int j = 0; j < _order - s; j++) //ä»¤å®ƒä»¬çš„çˆ¶èŠ‚ç‚¹ç»Ÿä¸€
+			u->child[j]->parent = u; //æŒ‡å‘u
 	}  
-	BTNode<T>* p = v->parent; //vµ±Ç°µÄ¸¸½Úµãp
+	BTNode<T>* p = v->parent; //vå½“å‰çš„çˆ¶èŠ‚ç‚¹p
 	if(!p){
 		_root = p = new BTNode<T>();
 		p->child[0] = v; 
 		v->parent = p; 
-	} //Èôp¿ÕÔò´´½¨Ö®
-	int r = 1 + p->key.search(v->key[0]); //pÖĞÖ¸ÏòuµÄÖ¸ÕëµÄÖÈ
-	p->key.insert(r, v->key.remove(s)); //Öáµã¹Ø¼üÂëÉÏÉı
+	} //è‹¥pç©ºåˆ™åˆ›å»ºä¹‹
+	int r = 1 + p->key.search(v->key[0]); //pä¸­æŒ‡å‘uçš„æŒ‡é’ˆçš„ç§©
+	p->key.insert(r, v->key.remove(s)); //è½´ç‚¹å…³é”®ç ä¸Šå‡
 	p->child.insert(r + 1, u);  
-	u->parent = p; //ĞÂ½ÚµãuÓë¸¸½Úµãp»¥Áª
-	solveOverflow(p); //ÉÏÉıÒ»²ã£¬ÈçÓĞ±ØÒªÔò¼ÌĞø·ÖÁÑ¡ª¡ªÖÁ¶àµİ¹éO(logn)²ã
+	u->parent = p; //æ–°èŠ‚ç‚¹uä¸çˆ¶èŠ‚ç‚¹päº’è”
+	solveOverflow(p); //ä¸Šå‡ä¸€å±‚ï¼Œå¦‚æœ‰å¿…è¦åˆ™ç»§ç»­åˆ†è£‚â€”â€”è‡³å¤šé€’å½’O(logn)å±‚
 }
 
-template<typename T>////¹Ø¼üÂëÉ¾³ıºóÈô½ÚµãÏÂÒç£¬Ôò×ö½ÚµãĞı×ª»òºÏ²¢´¦Àí
+template<typename T>////å…³é”®ç åˆ é™¤åè‹¥èŠ‚ç‚¹ä¸‹æº¢ï¼Œåˆ™åšèŠ‚ç‚¹æ—‹è½¬æˆ–åˆå¹¶å¤„ç†
 void BTree<T>::solveUnderFlow(BTNode<T>* v){
-	if((_order + 1) / 2 <= v->child.size())return;//µİ¹é»ù£ºµ±Ç°½Úµã²¢Î´ÏÂÒç
+	if((_order + 1) / 2 <= v->child.size())return;//é€’å½’åŸºï¼šå½“å‰èŠ‚ç‚¹å¹¶æœªä¸‹æº¢
 	BTNode<T>* p = v->parent;
-	if(!p){//µİ¹é»ù£ºÒÑµ½¸ù½Úµã£¬Ã»ÓĞº¢×ÓµÄÏÂÏŞ
-		if(!v->key.size() && v->child[0]){//Èô×÷ÎªÊ÷¸ùµÄvÒÑ²»º¬¹Ø¼üÂë£¬È´ÓĞ£¨Î¨Ò»µÄ£©·Ç¿Õº¢×Ó
-			_root = v->child[0];//Õâ¸ö½Úµã¿É±»Ìø¹ı
+	if(!p){//é€’å½’åŸºï¼šå·²åˆ°æ ¹èŠ‚ç‚¹ï¼Œæ²¡æœ‰å­©å­çš„ä¸‹é™
+		if(!v->key.size() && v->child[0]){//è‹¥ä½œä¸ºæ ‘æ ¹çš„vå·²ä¸å«å…³é”®ç ï¼Œå´æœ‰ï¼ˆå”¯ä¸€çš„ï¼‰éç©ºå­©å­
+			_root = v->child[0];//è¿™ä¸ªèŠ‚ç‚¹å¯è¢«è·³è¿‡
 			_root->parent = NULL;
 			v->child[0] = NULL;
-			release(v);//²¢Òò²»ÔÙÓĞÓÃ¶ø±»Ïú»Ù
-		}//ÕûÊ÷¸ß¶È½µµÍÒ»²ã
+			release(v);//å¹¶å› ä¸å†æœ‰ç”¨è€Œè¢«é”€æ¯
+		}//æ•´æ ‘é«˜åº¦é™ä½ä¸€å±‚
 		return;
 	}
 	int r = 0;
 	while(p->child[r] != v)r++;
-	//È·¶¨vÊÇpµÄµÚr¸öº¢×Ó¡ª¡ª´ËÊ±v¿ÉÄÜ²»º¬¹Ø¼üÂë£¬¹Ê²»ÄÜÍ¨¹ı¹Ø¼üÂë²éÕÒ
+	//ç¡®å®švæ˜¯pçš„ç¬¬rä¸ªå­©å­â€”â€”æ­¤æ—¶vå¯èƒ½ä¸å«å…³é”®ç ï¼Œæ•…ä¸èƒ½é€šè¿‡å…³é”®ç æŸ¥æ‰¾
 	
-	// Çé¿ö1£ºÏò×óĞÖµÜ½è¹Ø¼üÂë
-	if(0 < r){//Èôv²»ÊÇpµÄµÚÒ»¸öº¢×Ó
-		BTNode<T>* ls = p->child[r - 1];//×óĞÖµÜ±Ø´æÔÚ
-		if((_order + 1) / 2 < ls->child.size()){//Èô¸ÃĞÖµÜ×ã¹»¡°ÅÖ¡±
-			v->key.insert(0, p->key[r - 1]);//p½è³öÒ»¸ö¹Ø¼üÂë¸øv£¨×÷Îª×îĞ¡¹Ø¼üÂë£©
-			p->key[r - 1] = ls->key.remove(ls->key.size() - 1);//lsµÄ×î´ó¹Ø¼üÂë×ªÈëp
+	// æƒ…å†µ1ï¼šå‘å·¦å…„å¼Ÿå€Ÿå…³é”®ç 
+	if(0 < r){//è‹¥vä¸æ˜¯pçš„ç¬¬ä¸€ä¸ªå­©å­
+		BTNode<T>* ls = p->child[r - 1];//å·¦å…„å¼Ÿå¿…å­˜åœ¨
+		if((_order + 1) / 2 < ls->child.size()){//è‹¥è¯¥å…„å¼Ÿè¶³å¤Ÿâ€œèƒ–â€
+			v->key.insert(0, p->key[r - 1]);//på€Ÿå‡ºä¸€ä¸ªå…³é”®ç ç»™vï¼ˆä½œä¸ºæœ€å°å…³é”®ç ï¼‰
+			p->key[r - 1] = ls->key.remove(ls->key.size() - 1);//lsçš„æœ€å¤§å…³é”®ç è½¬å…¥p
 			v->child.insert(0, ls->child.remove(ls->child.size() - 1));
-			if(v->child[0]) v->child[0]->parent = v;//Í¬Ê±lsµÄ×îÓÒ²àº¢×Ó¹ı¼Ì¸øv,×÷ÎªvµÄ×î×ó²àº¢×Ó
-			return;//ÖÁ´Ë£¬Í¨¹ıÓÒĞıÒÑÍê³Éµ±Ç°²ã£¨ÒÔ¼°ËùÓĞ²ã£©µÄÏÂÒç´¦Àí
+			if(v->child[0]) v->child[0]->parent = v;//åŒæ—¶lsçš„æœ€å³ä¾§å­©å­è¿‡ç»§ç»™v,ä½œä¸ºvçš„æœ€å·¦ä¾§å­©å­
+			return;//è‡³æ­¤ï¼Œé€šè¿‡å³æ—‹å·²å®Œæˆå½“å‰å±‚ï¼ˆä»¥åŠæ‰€æœ‰å±‚ï¼‰çš„ä¸‹æº¢å¤„ç†
 		}
-	}//ÖÁ´Ë£¬×óĞÖµÜÒªÃ´Îª¿Õ£¬ÒªÃ´Ì«¡°Êİ¡±
+	}//è‡³æ­¤ï¼Œå·¦å…„å¼Ÿè¦ä¹ˆä¸ºç©ºï¼Œè¦ä¹ˆå¤ªâ€œç˜¦â€
 
-	//Çé¿ö2£ºÏòÓÒĞÖµÜ½è¹Ø¼üÂë
-	if(p->child.size() - 1 > r){//Èôv²»ÊÇpµÄ×îºóÒ»¸öº¢×Ó
-		BTNode<T>* rs = p->child[r + 1]; //ÓÒĞÖµÜ±Ø´æÔÚ
-		if((_order + 1) / 2 < rs->child.size()){//Èô¸ÃĞÖµÜ×ã¹»¡°ÅÖ¡±
-			v->key.insert(v->key.size(), p->key[r]); //p½è³öÒ»¸ö¹Ø¼üÂë¸øv£¨×÷Îª×î´ó¹Ø¼üÂë£©
-			p->key[r] = rs->key.remove(0);//lsµÄ×îĞ¡¹Ø¼üÂë×ªÈëp
+	//æƒ…å†µ2ï¼šå‘å³å…„å¼Ÿå€Ÿå…³é”®ç 
+	if(p->child.size() - 1 > r){//è‹¥vä¸æ˜¯pçš„æœ€åä¸€ä¸ªå­©å­
+		BTNode<T>* rs = p->child[r + 1]; //å³å…„å¼Ÿå¿…å­˜åœ¨
+		if((_order + 1) / 2 < rs->child.size()){//è‹¥è¯¥å…„å¼Ÿè¶³å¤Ÿâ€œèƒ–â€
+			v->key.insert(v->key.size(), p->key[r]); //på€Ÿå‡ºä¸€ä¸ªå…³é”®ç ç»™vï¼ˆä½œä¸ºæœ€å¤§å…³é”®ç ï¼‰
+			p->key[r] = rs->key.remove(0);//lsçš„æœ€å°å…³é”®ç è½¬å…¥p
 			v->child.insert(v->child.size(), rs->child.remove(0));
-			if(v->child[v->child.size() - 1]){//Í¬Ê±rsµÄ×î×ó²àº¢×Ó¹ı¼Ì¸øv
-				v->child[v->child.size() - 1]->parent = v;//×÷ÎªvµÄ×îÓÒ²àº¢×Ó
+			if(v->child[v->child.size() - 1]){//åŒæ—¶rsçš„æœ€å·¦ä¾§å­©å­è¿‡ç»§ç»™v
+				v->child[v->child.size() - 1]->parent = v;//ä½œä¸ºvçš„æœ€å³ä¾§å­©å­
 			}
-			return;//ÖÁ´Ë£¬Í¨¹ı×óĞıÒÑÍê³Éµ±Ç°²ã£¨ÒÔ¼°ËùÓĞ²ã£©µÄÏÂÒç´¦Àí
+			return;//è‡³æ­¤ï¼Œé€šè¿‡å·¦æ—‹å·²å®Œæˆå½“å‰å±‚ï¼ˆä»¥åŠæ‰€æœ‰å±‚ï¼‰çš„ä¸‹æº¢å¤„ç†
 		}
-	}//ÖÁ´Ë£¬ÓÒĞÖµÜÒªÃ´Îª¿Õ£¬ÒªÃ´Ì«¡°Êİ¡±
+	}//è‡³æ­¤ï¼Œå³å…„å¼Ÿè¦ä¹ˆä¸ºç©ºï¼Œè¦ä¹ˆå¤ªâ€œç˜¦â€
 	
-	//Çé¿ö3£º×ó¡¢ÓÒĞÖµÜÒªÃ´Îª¿Õ£¨µ«²»¿ÉÄÜÍ¬Ê±£©£¬ÒªÃ´¶¼Ì«¡°Êİ¡±¡ª¡ªºÏ²¢
-	if(0 < r){//Óë×óĞÖµÜºÏ²¢
-		BTNode<T>* ls = p->child[r - 1];//×óĞÖµÜ±Ø´æÔÚ
-		//pµÄµÚr - 1¸ö¹Ø¼üÂë×ªÈëls£¬v²»ÔÙÊÇpµÄµÚr¸öº¢×Ó
+	//æƒ…å†µ3ï¼šå·¦ã€å³å…„å¼Ÿè¦ä¹ˆä¸ºç©ºï¼ˆä½†ä¸å¯èƒ½åŒæ—¶ï¼‰ï¼Œè¦ä¹ˆéƒ½å¤ªâ€œç˜¦â€â€”â€”åˆå¹¶
+	if(0 < r){//ä¸å·¦å…„å¼Ÿåˆå¹¶
+		BTNode<T>* ls = p->child[r - 1];//å·¦å…„å¼Ÿå¿…å­˜åœ¨
+		//pçš„ç¬¬r - 1ä¸ªå…³é”®ç è½¬å…¥lsï¼Œvä¸å†æ˜¯pçš„ç¬¬rä¸ªå­©å­
 		ls->key.insert(ls->key.size(), p->key.remove(r - 1));
 		p->child.remove(r);
 		ls->child.insert(ls->child.size(), v->child.remove(0));
-		if(ls->child[ls->child.size() - 1]){//vµÄ×î×ó²àº¢×Ó¹ı¼Ì¸øls×ö×îÓÒ²àº¢×Ó
+		if(ls->child[ls->child.size() - 1]){//vçš„æœ€å·¦ä¾§å­©å­è¿‡ç»§ç»™lsåšæœ€å³ä¾§å­©å­
 			ls->child[ls->child.size() - 1] = ls;
 		}
-		while( !v->key.empty() ){//vÊ£ÓàµÄ¹Ø¼üÂëºÍº¢×Ó£¬ÒÀ´Î×ªÈëls
+		while( !v->key.empty() ){//vå‰©ä½™çš„å…³é”®ç å’Œå­©å­ï¼Œä¾æ¬¡è½¬å…¥ls
 			ls->key.insert(ls->key.size(), v->key.remove(0));
 			ls->child.insert(ls->child.size(), v->child.remove(0));
 			if(ls->child[ls->child.size() - 1])
 				ls->child[ls->child.size() - 1]->parent = ls;
 		}
-		release(v);//ÊÍ·Åv
+		release(v);//é‡Šæ”¾v
 	}
-	else{//ÓëÓÒĞÖµÜºÏ²¢
-		BTNode<T>* rs = p->child[r + 1];//ÓÒĞÖ¶È±Ø´æÔÚ
+	else{//ä¸å³å…„å¼Ÿåˆå¹¶
+		BTNode<T>* rs = p->child[r + 1];//å³å…„åº¦å¿…å­˜åœ¨
 		rs->key.insert(0, p->key.remove(r)); p->child.remove(r);
-		//pµÄµÚr¸ö¹Ø¼üÂë×ªÈërs£¬v²»ÔÙÊÇpµÄµÚr¸öº¢×Ó
+		//pçš„ç¬¬rä¸ªå…³é”®ç è½¬å…¥rsï¼Œvä¸å†æ˜¯pçš„ç¬¬rä¸ªå­©å­
 		rs->child.insert(0, v->child.remove(v->child.size() - 1 ));
 		if(rs->child[0]){
-			rs->child[0]->parent = rs; //vµÄ×î×ó²àº¢×Ó¹ı¼Ì¸øls×ö×îÓÒ²àº¢×Ó
+			rs->child[0]->parent = rs; //vçš„æœ€å·¦ä¾§å­©å­è¿‡ç»§ç»™lsåšæœ€å³ä¾§å­©å­
 		}
-		while(!v->key.empty()){ //vÊ£ÓàµÄ¹Ø¼üÂëºÍº¢×Ó£¬ÒÀ´Î×ªÈërs
+		while(!v->key.empty()){ //vå‰©ä½™çš„å…³é”®ç å’Œå­©å­ï¼Œä¾æ¬¡è½¬å…¥rs
 			rs->key.insert(0, v->key.remove(v->key.size() - 1));
 			rs->child.insert(0, v->child.remove(v->child.size() - 1));
 			if(rs->child[0]){
 				rs->child[0]->parent = rs;
 			}
 		}
-		release(v); //ÊÍ·Åv
+		release(v); //é‡Šæ”¾v
 	}
 
-	solveUnderFlow(p);//ÉÏÉıÒ»²ã£¬ÈçÓĞ±ØÒªÔò¼ÌĞø·ÖÁÑ¡ª¡ªÖÁ¶àµİ¹éO(logn)²ã
+	solveUnderFlow(p);//ä¸Šå‡ä¸€å±‚ï¼Œå¦‚æœ‰å¿…è¦åˆ™ç»§ç»­åˆ†è£‚â€”â€”è‡³å¤šé€’å½’O(logn)å±‚
 	return;
 }
 
 
-//½øĞĞn´ÎËæ»ú²Ù×÷(²éÕÒ£¬²åÈë£¬É¾³ı)£¬Ëæ»úÊı¾İ·¶Î§Îª[0, m)
+//è¿›è¡Œnæ¬¡éšæœºæ“ä½œ(æŸ¥æ‰¾ï¼Œæ’å…¥ï¼Œåˆ é™¤)ï¼Œéšæœºæ•°æ®èŒƒå›´ä¸º[0, m)
 void testBTreeRandom(int n, int m, int order){
 	assert(order >= 3);
 	BTree<int> bt(order);
@@ -259,7 +248,7 @@ int main(){
 	start = clock();
 	testBTreeRandom(n, m, ord);
 	finish = clock();
-	//¿ÉÒÔ¿´µ½ÔÚÍ³¼ÆÒâÒåÉÏ, ´ïµ½ÁËÎÈ¶¨µÄnlogm¸´ÔÓ¶È, µ«ÊÇsplayÊ÷µÄ³£Êı±È½Ï´ó£¡£¡£¡
+	//å¯ä»¥çœ‹åˆ°åœ¨ç»Ÿè®¡æ„ä¹‰ä¸Š, è¾¾åˆ°äº†ç¨³å®šçš„nlogmå¤æ‚åº¦, ä½†æ˜¯splayæ ‘çš„å¸¸æ•°æ¯”è¾ƒå¤§ï¼ï¼ï¼
 	printf("\n%d operations finished...tot time:%f...nlogm = %.2f\n\n", \
 		n, (double)(finish - start) / CLOCKS_PER_SEC, double(n) * log(double(n)) / log(ord));
 	return 0;
