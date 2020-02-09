@@ -1,0 +1,88 @@
+
+//(cmd): dot hellodot.dot -T png -o demo.png
+//       dot hellodot.dot -T jpeg -o demo.jpeg
+//       circo hellodot.dot -T png -o demo2.png (防止图形之间发生覆盖)
+
+/*
+digraph abc{//有向图，无向图用(graph)
+  a;
+  b;
+  c;
+  d;
+  a -> b;
+  b -> d;
+  c -> d;
+}
+*/
+/*
+strict graph {
+  // 设置节点属性
+  b [shape=box];
+  c [shape=triangle];
+
+  // 设置边属性
+  a -- b [color=blue];
+  a -- c [style=dotted];
+}
+*/
+/*
+digraph graphname{ 
+    a -> {b c};
+    c -> e;
+    b -> d;
+
+    subgraph cluster_bc {
+        bgcolor=red;
+        b;
+        c;
+    }
+
+    subgraph cluster_de {
+        label="Block"
+        d;
+        e;
+    }
+}
+*/
+/*
+digraph st2{
+  fontname = "Verdana";
+  fontsize = 10;
+  rankdir=TB;
+  //显示属性
+  node [fontname = "Verdana", fontsize = 10, color="skyblue", shape="record"];
+ 
+  edge [fontname = "Verdana", fontsize = 10, color="crimson", style="solid"];
+  //图形形状
+  st_hash_type [label="{<head>st_hash_type|(*compare)|(*hash)}"];//尖括号是“锚点”，可以用于指针的指向
+  st_table_entry [label="{<head>st_table_entry|hash|key|record|<next>next}"];
+  st_table [label="{st_table|<type>type|num_bins|num_entries|<bins>bins}"];
+  //图形连接关系
+  st_table:bins -> st_table_entry:head;
+  st_table:type -> st_hash_type:head;
+  st_table_entry:next -> st_table_entry:head [style="dashed", color="forestgreen"];
+}
+*/
+//状态图
+
+digraph automata_0 {
+  size = "8.5, 11";
+  fontname = "Microsoft YaHei";
+  fontsize = 10;
+ 
+  node [shape = circle, fontname = "Microsoft YaHei", fontsize = 10];
+  edge [fontname = "Microsoft YaHei", fontsize = 10];
+  //定义单个图形元数据，若没有定义默认为 单线圆
+  0 [ style = filled, color=lightgrey ];
+  2 [ shape = doublecircle ]; //双线圆
+  "Machine: a" [ shape = plaintext ];
+
+  //定义连接关系
+  0 -> 2 [ label = "a " ];
+  0 -> 1 [ label = "other " ];
+  1 -> 2 [ label = "a " ];
+  1 -> 1 [ label = "other " ];
+  2 -> 2 [ label = "a " ];
+  2 -> 1 [ label = "other " ];
+ 
+}
