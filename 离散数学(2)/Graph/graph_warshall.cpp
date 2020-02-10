@@ -11,8 +11,8 @@ bool** Graph::warshall(bool print){
 	}
 	//从邻接表得到邻接矩阵, 同样适用于无向图
 	for(int i = 0; i < n; i++){
-		for(list<Edge>::iterator iter = edgeList[i].begin(); iter != edgeList[i].end(); iter++){
-			reachable[i][iter->to] = true;
+		for(auto& iter : edgeList[i]){
+			reachable[i][iter.to] = true;
 		}
 		reachable[i][i] = true;
 	}

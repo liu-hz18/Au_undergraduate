@@ -11,16 +11,16 @@ int main(){
 	//有向图
 	//Graph* G = new Graph(n, /*isDirect =*/ true);
 	int f, t, w;
-	
 	//手动加边
 	for(int i = 0; i < m; i++){
 		scanf("%d%d%d", &f, &t, &w);
 		f--, t--;//如果序从1开始
 		G->insertEdge(f, t, w);
 	}
-	
-	//生成随机图
-	//G->randomGraph(m, /*edge =*/ 10);
+
+	//生成随机图, 随机图并不具备鲜明的群体性特征，不适合作为输入样例
+	//G->randomGraph(m, /*weight_max =*/ 1);
+	//G->printEdge();
 	
 	//bfs测试
 	//G->bfs(/*s =*/0);//可以任选一个[0, n)的点进行bfs
@@ -44,11 +44,11 @@ int main(){
 	//G->getCloseCet(/*hasNegEdge =*/ false);
 
 	//prim 测试
-	list<Edge>* treeList = new list<Edge>;
-	printf("%d\n", G->primBrute(/*root =*/ 0, treeList));
-	G->printVetex();
-	G->printEdge();
-	G->printSpanningTree();
+	//list<Edge>* treeList = new list<Edge>;
+	//printf("%d\n", G->primBrute(/*root =*/ 0, treeList));
+	//G->printVetex();
+	//G->printEdge();
+	//G->printSpanningTree();
 
 	//treeList->clear();
 	//printf("%d\n", G->primHeap(/*root =*/ 0, treeList));
@@ -74,6 +74,10 @@ int main(){
 	//printf("spanning tree number:%d\n", G->countSpanningTree());
 	//有向图的根数，序从1开始
 	//printf("%d\n", G->spanningTreeFromRoot(/* root=*/1));
+
+	//社群发现测试, 对于群体性特征不明显的图，可以加大迭代次数
+	printf("modularity:%f \n", G->communityDetecting(/*iter=*/50));
+	G->printVetex();
 
 	delete G;
 	return 0;

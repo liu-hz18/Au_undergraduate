@@ -5,19 +5,19 @@
 bool Graph::TSortOutdegree(int v, int& clock, stack<int>* S){
 	vertex[v].dTime = ++clock;
 	vertex[v].state = DISCOVERED;
-	for(list<Edge>::iterator iter = edgeList[v].begin(); iter != edgeList[v].end(); iter++){
-		int u = iter->to;
+	for(auto& iter : edgeList[v]){
+		int u = iter.to;
 		switch(vertex[u].state){
 			case UNDISCOVERED:
 				vertex[u].parent = v;
-				iter->edgeType = TREE;
+				iter.edgeType = TREE;
 				if(!TSortOutdegree(u, clock, S))return false;//若u及其后代不能拓扑排序（则全图亦必如此），故返回并报告
 				break;
 			case DISCOVERED:
-				iter->edgeType = BACKWARD; //一旦发现后向边（非DAG），则不必深入，故返回并报告
+				iter.edgeType = BACKWARD; //一旦发现后向边（非DAG），则不必深入，故返回并报告
 				return false;
 			default:
-				iter->edgeType = (vertex[v].dTime < vertex[u].dTime) ? FORWARD : CROSS;
+				iter.edgeType = (vertex[v].dTime < vertex[u].dTime) ? FORWARD : CROSS;
 				break;
 		}
 	}
@@ -69,8 +69,8 @@ stack<int>* Graph::topoSortKahn(bool print){
 		int v = Q->front();
 		Q->pop();
 		S->push(v);
-		for(list<Edge>::iterator iter = edgeList[v].begin(); iter != edgeList[v].end(); iter++){
-			if(--indeg[iter->to] == 0)Q->push(iter->to);
+		for(auto& iter : edgeList[v]){
+			if(--indeg[iter.to] == 0)Q->push(iter.to);
 		}
 	}
 	stack<int>* revS = new stack<int>;

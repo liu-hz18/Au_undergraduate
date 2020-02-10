@@ -1,7 +1,5 @@
 
-#ifndef _VERTEX_H_
-#define _VERTEX_H_
-
+#pragma once
 #include "macro.h"
 
 //顶点类
@@ -15,9 +13,10 @@ struct Vertex{
 	int betweenCentrality, closeCentrality;//介数中心度 和 紧密中心度
 	int topoIndex;//拓扑排序的rank
 	int earStartTime, latStartTime;//最早启动时间和最晚启动时间
+	int community;//属于的社群
 	Vertex():inDegree(0), outDegree(0), state(UNDISCOVERED), 
 		dTime(-1), fTime(-1), parent(-1), priority(INT_MAX),
-		betweenCentrality(0), closeCentrality(0), topoIndex(-1){}
+		betweenCentrality(0), closeCentrality(0), topoIndex(-1), community(-1){}
 	void reset(){
 		dTime = fTime = parent = topoIndex = -1;
 		state = UNDISCOVERED;
@@ -31,5 +30,3 @@ struct Vertex{
 		return priority == v.priority;
 	}
 };
-
-#endif

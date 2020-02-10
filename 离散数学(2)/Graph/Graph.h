@@ -1,10 +1,11 @@
 
-#ifndef _GRAPH_H_
-#define _GRAPH_H_
+#pragma once
 
 #include "vertex.h"
 #include "edge.h"
 #include "vertex_PT.h"
+#include "unionSet.h"
+#include "community.h"
 
 //有向图类
 class Graph{
@@ -28,7 +29,13 @@ private:
 	
 	void getBetweenCent(int** distMatrix, int** path);//得到介数中心度
 
-	void printPath(int from, int to);//打印任意两点间最短路径
+	void printPath(int from, int to, int** mat);//打印任意两点间最短路径
+
+	int** listToMatrix();//邻接表转邻接矩阵
+
+	reducedNode* initReduceGraph();//初始化信息简化的图
+
+	unionSet* fastUnfolding(double& modu);//社群发现fastUnfolding算法
 
 public:
 	//输入顶点个数 和 是否是有向图
@@ -103,7 +110,6 @@ public:
 
 	int spanningTreeFromRoot(int r);//有向图以r为根的叶向树
 
+	double communityDetecting(int iter);//社群发现
+
 };
-
-#endif
-

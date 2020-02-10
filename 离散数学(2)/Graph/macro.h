@@ -1,7 +1,5 @@
 
-#ifndef _MACRO_H_
-#define _MACRO_H_
-
+#pragma once
 #include <assert.h>
 #include <time.h>
 #include <stdlib.h>
@@ -34,5 +32,3 @@ using namespace std;
 #define CROSS 2
 #define FORWARD 3
 #define BACKWARD 4
-
-#endif

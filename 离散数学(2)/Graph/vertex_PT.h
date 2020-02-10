@@ -1,6 +1,5 @@
 
-#ifndef _VERTEX_PT_H_
-#define _VERTEX_PT_H_
+#pragma once
 
 struct vertexPT{
 	int index;
@@ -11,5 +10,3 @@ struct vertexPT{
 		index = id, rank = ra, earStartTime = ear, latStartTime = lat;
 	}
 };
-
-#endif

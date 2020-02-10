@@ -16,11 +16,11 @@ int Graph::kruskal(list<Edge>* result){
 	int count = 0, sum = 0;
 	//有向图遍历方式，无向图在邻接表中边数为2e，所以只需要存一半
 	for(int i = 0; i < n; i++){
-		for(list<Edge>::iterator iter = edgeList[i].begin(); iter != edgeList[i].end(); iter++){
-			if(!isDirected && iter->to <= i)continue;//保证无向图每个边只存一次
+		for(auto& iter : edgeList[i]){
+			if(!isDirected && iter.to <= i)continue;//保证无向图每个边只存一次
 			edge[count].data = i;
-			edge[count].to = iter->to;
-			edge[count].weight = iter->weight;
+			edge[count].to = iter.to;
+			edge[count].weight = iter.weight;
 			count++;
 		}
 	}

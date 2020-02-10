@@ -1,7 +1,5 @@
 
-#ifndef _MINHEAP_H_
-#define _MINHEAP_H_
-
+#pragma once
 #include "util.h"
 
 //×îÐ¡¶Ñ
@@ -67,5 +65,3 @@ public:
 		return _currentSize <= 1;
 	}
 };
-
-#endif

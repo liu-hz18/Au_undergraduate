@@ -1,7 +1,5 @@
 
-#ifndef _MATRIX_H_
-#define _MATRIX_H_
-
+#pragma once
 #include "util.h"
 #include <stdio.h>
 
@@ -84,5 +82,3 @@ public:
 	}
 
 };
-
-#endif

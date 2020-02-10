@@ -16,8 +16,8 @@ void Graph::earlistStartTime(){
 	//重建入度邻接表， 入度表中to是from
 	list<Edge>* indeg = new list<Edge>[n];
 	for(int i = 0; i < n; i++){
-		for(list<Edge>::iterator it = edgeList[i].begin(); it != edgeList[i].end(); it++){
-			indeg[it->to].push_back(Edge(i, it->weight));
+		for(auto& it : edgeList[i]){
+			indeg[it.to].push_back(Edge(i, it.weight));
 		}
 	}
 	int* rank = new int[n];
@@ -26,8 +26,8 @@ void Graph::earlistStartTime(){
 	vertexpt[0].earStartTime = 0;
 	for(int i = 1; i < n; i++){
 		int max = -1;
-		for(list<Edge>::iterator it = indeg[vertexpt[i].index].begin(); it != indeg[vertexpt[i].index].end(); it++){
-			if(max < vertexpt[rank[it->to]].earStartTime + it->weight)max = vertexpt[rank[it->to]].earStartTime + it->weight;
+		for(auto& it : indeg[vertexpt[i].index]){
+			if(max < vertexpt[rank[it.to]].earStartTime + it.weight)max = vertexpt[rank[it.to]].earStartTime + it.weight;
 		}
 		vertexpt[i].earStartTime = max;
 	}
@@ -46,8 +46,8 @@ void Graph::latestStartTime(){
 	vertexpt[n-1].latStartTime = vertexpt[n-1].earStartTime;
 	for(int i = n-2; i >= 0; i--){
 		int min = INT_MAX;
-		for(list<Edge>::iterator it = edgeList[vertexpt[i].index].begin(); it != edgeList[vertexpt[i].index].end(); it++){
-			if(min > vertexpt[rank[it->to]].latStartTime - it->weight)min = vertexpt[rank[it->to]].latStartTime - it->weight;
+		for(auto& it : edgeList[vertexpt[i].index]){
+			if(min > vertexpt[rank[it.to]].latStartTime - it.weight)min = vertexpt[rank[it.to]].latStartTime - it.weight;
 		}
 		vertexpt[i].latStartTime = min;
 	}

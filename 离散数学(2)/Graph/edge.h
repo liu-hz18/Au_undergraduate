@@ -1,7 +1,5 @@
 
-#ifndef _EDGE_H_
-#define _EDGE_H_
-
+#pragma once
 #include "macro.h"
 
 //±ﬂ¿‡
@@ -24,5 +22,3 @@ struct Edge{
 		return weight < e.weight;
 	}
 };
-
-#endif

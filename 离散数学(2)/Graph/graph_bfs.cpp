@@ -11,15 +11,15 @@ void Graph::BFS(int v, int& clock){
 		Q.pop();
 		vertex[v].dTime = ++clock;
 		//遍历所有出边
-		for(list<Edge>::iterator iter = edgeList[v].begin(); iter != edgeList[v].end(); iter++){
-			int u = iter->to;
+		for(auto& iter :edgeList[v]){
+			int u = iter.to;
 			if(vertex[u].state == UNDISCOVERED){
 				vertex[u].state = DISCOVERED;
 				Q.push(u);
 				vertex[u].parent = v;
-				iter->edgeType = TREE;
+				iter.edgeType = TREE;
 			}else{
-				iter->edgeType = CROSS;
+				iter.edgeType = CROSS;
 			}
 		}
 		vertex[v].state = VISITED;

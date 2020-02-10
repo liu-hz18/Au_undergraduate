@@ -16,11 +16,11 @@ int Graph::primBrute(int s, list<Edge>* result){
 			result->push_back(e);
 			sum += shortest;
 		}
-		for(list<Edge>::iterator iter = edgeList[u].begin(); iter != edgeList[u].end(); iter++){
-			int j = iter->to;
+		for(auto& iter :edgeList[u]){
+			int j = iter.to;
 			//松弛操作
-			if(vertex[j].state == UNDISCOVERED && vertex[j].priority > iter->weight){
-				vertex[j].priority = iter->weight;
+			if(vertex[j].state == UNDISCOVERED && vertex[j].priority > iter.weight){
+				vertex[j].priority = iter.weight;
 				vertex[j].parent = u;//为还原树的结构，必须记录parent
 			}
 		}
@@ -55,10 +55,10 @@ int Graph::primHeap(int s, list<Edge>* result){
 		}
 		if(vertex[u].state == VISITED)continue;
 		vertex[u].state = VISITED;
-		for(list<Edge>::iterator iter = edgeList[u].begin(); iter != edgeList[u].end(); iter++){
-			int j = iter->to;
-			if(vertex[j].priority > iter->weight){//松弛
-				vertex[j].priority = iter->weight;
+		for(auto& iter : edgeList[u]){
+			int j = iter.to;
+			if(vertex[j].priority > iter.weight){//松弛
+				vertex[j].priority = iter.weight;
 				vertex[j].parent = u;//为还原树的结构，必须记录parent
 				H.push(vertex[j]);
 			}

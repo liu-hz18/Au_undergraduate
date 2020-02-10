@@ -11,11 +11,11 @@ void Graph::dijkstraBrute(int s){
 	//引入n个顶点和n-1条边
 	for(int i = 0;i < n;i ++){
 		vertex[s].state = VISITED;
-		for(list<Edge>::iterator iter = edgeList[s].begin(); iter != edgeList[s].end(); iter++){
-			int j = iter->to;
+		for(auto& iter : edgeList[s]){
+			int j = iter.to;
 			//松弛操作
-			if(vertex[j].state == UNDISCOVERED && vertex[j].priority > add(vertex[s].priority, iter->weight)){
-				vertex[j].priority = vertex[s].priority + iter->weight;
+			if(vertex[j].state == UNDISCOVERED && vertex[j].priority > add(vertex[s].priority, iter.weight)){
+				vertex[j].priority = vertex[s].priority + iter.weight;
 				vertex[j].parent = s;
 			}
 		}
@@ -45,10 +45,10 @@ void Graph::dijkstraHeap(int s){
 		int u = H.pop().data;
 		if(vertex[u].state == VISITED)continue;//注意此处，不是u->next被访问，而是u被访问
 		vertex[u].state = VISITED;
-		for(list<Edge>::iterator iter = edgeList[u].begin(); iter != edgeList[u].end(); iter++){
-			int j = iter->to;
-			if(vertex[j].priority > add(vertex[u].priority, iter->weight)){//松弛
-				vertex[j].priority = vertex[u].priority + iter->weight;
+		for(auto& iter : edgeList[u]){
+			int j = iter.to;
+			if(vertex[j].priority > add(vertex[u].priority, iter.weight)){//松弛
+				vertex[j].priority = vertex[u].priority + iter.weight;
 				vertex[j].parent = u;
 				H.push(vertex[j]);
 			}

@@ -14,10 +14,10 @@ bool Graph::bellmanFord(int s){
 	//bfs
 	while(!Q.empty()){
 		int v = Q.front(); Q.pop(); inqueue[v] = false;
-		for(list<Edge>::iterator iter = edgeList[v].begin(); iter != edgeList[v].end(); iter++){
-			int u = iter->to;
-			if(vertex[u].priority > add(vertex[v].priority, iter->weight)){//киЁз
-				vertex[u].priority = vertex[v].priority + iter->weight;
+		for(auto& iter :edgeList[v]){
+			int u = iter.to;
+			if(vertex[u].priority > add(vertex[v].priority, iter.weight)){//киЁз
+				vertex[u].priority = vertex[v].priority + iter.weight;
 				if(!inqueue[u]){ Q.push(u); inqueue[u] = true; }
 			}
 		}
