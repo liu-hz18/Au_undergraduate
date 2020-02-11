@@ -1,0 +1,257 @@
+
+%\documentclass[twocolumn]{article} %双栏设置, 或者用 逗号 隔开
+\documentclass[UTF8, onecolumn, a4paper]{article}
+\usepackage{ctex}
+\usepackage{geometry}
+\usepackage{amsmath}
+%\usepackage{hyperref}
+\usepackage{multirow, multicol}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+%\usepackage[ruled]{algorithm2e}
+\usepackage[ruled,vlined]{algorithm2e}
+%\usepackage[linesnumbered,boxed]{algorithm2e}
+\usepackage{ctex}
+\usepackage{lettrine}
+\usepackage{authblk}
+\usepackage{listings}%用于显示代码
+\usepackage{xcolor}%用于设置颜色
+\usepackage{fontspec}
+\geometry{left=3.0cm,right=3.0cm,top=2.0cm,bottom=3.0cm}
+
+\title{Community Detection}%———总标题
+\author{Liu Hongzun}
+\affil{Department of Computer Science, Tsinghua University}
+\date{2020.02.10}
+
+\begin{document}
+	\thanks{liu-hz18@mails.tsinghua.edu.cn}
+	\maketitle %输入此句才会显示标题
+	\setlength{\columnsep}{25pt}% 调整文本距中心线的边距
+	\columnseprule=0.7pt %实现插入分隔线
+	\begin{multicols}{2}% 分栏
+		\lettrine[lines=2]{S}{ ocial}, technological and information systems can often be described in terms of complex
+		networks that have a topology of interconnected nodes combining organization and
+		randomness.The typical size of large networks such as social network services, mobile phone networks or the web now counts in millions when not billions of nodes
+		and these scales demand new methods to retrieve comprehensive information from their
+		structure.A promising approach consists in decomposing the networks into sub-units
+		or communities, which are sets of highly inter-connected nodes. The identification of
+		these communities is of crucial importance as they may help to uncover a-priori unknown
+		functional modules such as topics in information networks or cyber-communities in social
+		networks. Moreover, the resulting meta-network, whose nodes are the communities, may
+		then be used to visualize the original network structure.
+		The problem of community detection requires the partition of a network into
+		communities of densely connected nodes, with the nodes belonging to different
+		communities being only sparsely connected. Precise formulations of this optimization
+		problem are known to be computationally intractable. Several algorithms have therefore
+		been proposed to find reasonably good partitions in a reasonably fast way. This search
+		for fast algorithms has attracted much interest in recent years due to the increasing
+		availability of large network data sets and the impact of networks on every day life. One
+		can distinguish several types of community detection algorithms: divisive algorithms
+		detect inter-community links and remove them from the network, agglomerative
+		algorithms merge similar nodes/communities recursively and optimization methods
+		are based on the maximisation of an objective function.
+	\end{multicols}
+
+	定义图$G$的模块度(modularity):
+	\begin{equation}
+	\begin{aligned}
+	Q &= \frac{1}{2m}\underset{i,j\in 1,2,...n}{\sum}\left(A_{ij} - \frac{d_i d_j}{2m}\right)\delta(C_i, C_j)\\
+	&=\underset{i}{\sum}\left(\frac{d_{in}(C_i)}{2m} - \left(\frac{d_{tot}(C_i)}{2m}\right)^2\right)
+	\end{aligned}
+	\end{equation}
+	将节点$i$从社群$C_k$移出，移入社群$C_j$,对模块度$Q$的贡献为:
+	\begin{equation}
+	\begin{aligned}
+	\triangle Q(i, C_j) &= \frac{1}{2m} \left[ \left(d_{in}(C_j) + d(k, C_j) - \frac{(d_{tot}(C_j)+d_k)^2}{2m}\right)+
+	\left( d_{in}(C_i) + d(k, C_i) - \frac{(d_{tot}(C_i)-d_k)^2}{2m} \right)\right]\\ 
+	&\qquad - \frac{1}{2m} \left[ \left(d_{in}(C_j) - \frac{d_{tot}(C_j)^2}{2m}\right) + 
+	\left( d_{in}(C_i) - \frac{ d_{tot} (C_i)^2 }{ 2m } \right) \right] \\
+	&= \frac{1}{2m}\left[d(C_j, k) - d(C_i, k) - \frac{2}{2m}\left(d_k \cdot(d_{tot}(C_j) - d_{tot}(C_i) + d_k)\right)\right]
+	\end{aligned}
+	\end{equation}
+	
+	下面我们给出图的社群发现算法之一: Fast Unfolding\\
+	\begin{algorithm}[H]
+		\caption{Fast Unfolding Method}%算法名字
+		%\LinesNumbered %要求显示行号
+		\KwIn{$G=(V, E)$;}%输入参数
+		\KwOut{clustering of $G$;}%输出
+		$k = 0, G^0 = G$;\\ %\;用于换行
+		\While{community partition (modularity) can still be changed (improved)}{
+			make a simple clustering $C^k$ of $G^k$ such that $C_i^k = \{i\}$;\\
+			\For{node $i \in G^k$}{
+				remove the node $i$ from its community $C_i^k$;\\
+				$C_N$ = set of neighbour communities of node $i$;\\
+				$C_j^k = \arg\underset{C_{j'}^k\in C_N}{\max}\triangle Q(i, C_{j'}^k)$;\\
+				%argmax是一种函数，是对函数求参数(集合)的函数。当我们有另一个函数y=f(x)时，
+				%若有结果x0= argmax(f(x))，则表示当函数f(x)取x=x0的时候，得到f(x)取值范围的最大值
+				\eIf{$\triangle Q(i, C_{j'}^k)>0$}
+				{
+					add node $i$ to the community $C_j^k$;
+				}
+				{
+					leave node $i$ in the community $C_i^k$;
+				}
+			}
+			build a new graph $G^{k+1}$ whose nodes are the communities of $C^k$;\\
+			$k = k+1$;
+		}
+		make a clustering $C_{final}$ of $G$;\\
+		\Return $C_{final}$
+	\end{algorithm}
+	This approach reduces the computation time, especially on large networks, and still provides a high coefficient of modularity.\\
+	
+	\lstset{%代码块全局设置
+		backgroundcolor=\color{red!3!green!3!blue!3},%代码块背景色为浅灰色
+		rulesepcolor= \color{gray}, %代码块边框颜色
+		breaklines=true,  %代码过长则换行
+		numbers=left, %行号在左侧显示
+		numberstyle= \small,%行号字体
+		%keywordstyle= \color{red},%关键字颜色
+		commentstyle=\color{gray}, %注释颜色
+		frame=shadowbox,%用方框框住代码块
+		xleftmargin=1em,
+		xrightmargin=0em,
+		tabsize=5,
+		%rulesepcolor=\color{red!20!green!20!blue!20},  %阴影颜色
+		keywordstyle={\color{blue!90!}\fontspec{Consolas Bold}},   %关键字颜色
+		commentstyle={\color{blue!70!black}\fontspec{Consolas Italic}},   %注释颜色
+		stringstyle=\color{orange!100!black}, %字符串颜色
+		numberstyle=\color{purple}, %行号颜色
+		%basicstyle=\ttfamily, %代码风格
+		basicstyle=\fontspec{Consolas},
+		showstringspaces=false,          % underline spaces within strings only  
+		showtabs=false,
+		captionpos=t, %文件标题位置
+		flexiblecolumns
+	}
+	
+\begin{lstlisting}[language={java}, title={helloWorld.java}]
+public class Main {
+	public static void main(String[] args){
+		System.out.println("Hello World");
+	}
+}
+\end{lstlisting}
+
+%在代码块中插入公式使用:mathescape
+\begin{lstlisting}[language={c++}, title={bubbleSort.c},mathescape] 
+#include <iostream>  
+#define LENGTH 8  
+using namespace std;  
+//测试用的代码，bubbleSort函数  
+int main() {  
+	int temp,number[LENGTH]={95, 45, 15, 78, 84, 51, 24, 12};  
+	for(int i = 0; i < LENGTH; i++){  
+		for(int j = 0; j < LENGTH - 1 - i; j++){  
+			if(number[j] > number[j+1]) {  
+				temp = number[j];  
+				number[j] = number[j+1];  
+				number[j+1] = temp;  
+			} //if end  
+		}
+	}
+	for(int i = 0; i < LENGTH; i++) 
+		cout << number[i] << " ";  
+	cout << endl;
+	/* the following code computes $\sum_{i=0}^{n}i$ */
+	for (i = 1; i <= limit; i++) {
+		sum += i;
+	}
+	return 0;  
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language={python}, title={test.py}]
+import random
+n = 100
+s = [0 for i in range(n)]
+
+for j in range(1000):
+count = [0 for m in range(n)]
+i = 0
+while i < n:
+count[i] += 1
+if random.randint(0, 1) == 0:
+i += 1
+for k in range(n):
+s[k] += count[k]
+
+print(s)
+\end{lstlisting}
+	
+	\begin{algorithm}[H]
+		\caption{How to write algorithms}
+		\KwIn{this text}
+		\KwOut{how to write algorithm with \LaTeX2e }
+		initialization;\\
+		\While{not at end of this document}{
+			read current;\\
+			\eIf{understand}
+			{
+				go to next section;
+				current section becomes this one;
+			}
+			{
+				go back to the beginning of current section;
+			}
+		}
+	\end{algorithm}
+
+	\begin{algorithm} 
+		\SetAlgoNoLine  %去掉之前的竖线
+		\caption{identify Row Context} 
+		\KwIn{$r_i$, $Backgrd(T_i)$=${T_1,T_2,\ldots ,T_n}$ and similarity threshold $\theta_r$} 
+		\KwOut{$con(r_i)$} 
+		$con(r_i)= \Phi$\\ 
+		\For{$j=1;j \le n;j \ne i$} 
+		{ 
+			float $maxSim=0$\\
+			$r^{maxSim}=null$\\
+			\While{not end of $T_j$} 
+			{ 
+				compute Jaro($r_i,r_m$)($r_m\in T_j$)\\
+				\If{$(Jaro(r_i,r_m) \ge \theta_r)\wedge (Jaro(r_i,r_m)\ge r^{maxSim})$} 
+				{ 
+					replace $r^{maxSim}$ with $r_m$\\
+				} 
+			} 
+			$con(r_i)=con(r_i)\cup {r^{maxSim}}$\\
+		} 
+		return $con(r_i)$\\
+	\end{algorithm}
+	
+	%常用模板
+	\begin{algorithm}[H]
+		\caption{algorithm caption}%算法名字
+		\LinesNumbered %要求显示行号
+		\KwIn{input parameters A, B, C}%输入参数
+		\KwOut{output result}%输出
+		some description\; %\;用于换行
+		\For{condition}{
+			only if\\
+			\If{condition}{
+				1\\
+			}
+		}
+		\While{not at end of this document}{
+			if and else\\
+			\eIf{condition}{
+				1\\
+			}{
+				2\\
+			}
+		}
+		\ForEach{condition}{
+			\If{condition}{
+				1\\
+			}
+		}
+	\end{algorithm}
+	
+
+	
+\end{document}
+
