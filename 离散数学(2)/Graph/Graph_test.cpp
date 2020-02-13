@@ -6,44 +6,44 @@
 int main(){
 	int n, m;
 	scanf("%d%d", &n, &m);
-	//ÎŞÏòÍ¼
+	//æ— å‘å›¾
 	Graph* G = new Graph(n, /*isDirect =*/ false);
-	//ÓĞÏòÍ¼
+	//æœ‰å‘å›¾
 	//Graph* G = new Graph(n, /*isDirect =*/ true);
 	int f, t, w;
-	//ÊÖ¶¯¼Ó±ß
+	//æ‰‹åŠ¨åŠ è¾¹
 	for(int i = 0; i < m; i++){
 		scanf("%d%d%d", &f, &t, &w);
-		f--, t--;//Èç¹ûĞò´Ó1¿ªÊ¼
+		f--, t--;//å¦‚æœåºä»1å¼€å§‹
 		G->insertEdge(f, t, w);
 	}
 
-	//Éú³ÉËæ»úÍ¼, Ëæ»úÍ¼²¢²»¾ß±¸ÏÊÃ÷µÄÈºÌåĞÔÌØÕ÷£¬²»ÊÊºÏ×÷ÎªÊäÈëÑùÀı
+	//ç”Ÿæˆéšæœºå›¾, éšæœºå›¾å¹¶ä¸å…·å¤‡é²œæ˜çš„ç¾¤ä½“æ€§ç‰¹å¾ï¼Œä¸é€‚åˆä½œä¸ºè¾“å…¥æ ·ä¾‹
 	//G->randomGraph(m, /*weight_max =*/ 1);
 	//G->printEdge();
 	
-	//bfs²âÊÔ
-	//G->bfs(/*s =*/0);//¿ÉÒÔÈÎÑ¡Ò»¸ö[0, n)µÄµã½øĞĞbfs
+	//bfsæµ‹è¯•
+	//G->bfs(/*s =*/0);//å¯ä»¥ä»»é€‰ä¸€ä¸ª[0, n)çš„ç‚¹è¿›è¡Œbfs
 	
-	//dfs²âÊÔ
+	//dfsæµ‹è¯•
 	//G->dfs(/*s =*/0);
 	
-	//ÍØÆËÅÅĞò²âÊÔ
+	//æ‹“æ‰‘æ’åºæµ‹è¯•
 	//G->topoSortDFS(/*s =*/ 0, /* print =*/ true);
 	//G->earlistStartTime();
 	//G->latestStartTime();
 	//G->printVetex();
 	//G->topoSortKahn(/* print =*/ true);
 	
-	//dijktra²âÊÔ
+	//dijktraæµ‹è¯•
 	//G->dijkstraBrute(/*s =*/ 0);
 	//G->printVetex();
 	//G->dijkstraHeap(/*s =*/ 0);
 	//G->printVetex();
-	//»ñµÃ½ôÃÜÖĞĞÄ¶È
+	//è·å¾—ç´§å¯†ä¸­å¿ƒåº¦
 	//G->getCloseCet(/*hasNegEdge =*/ false);
 
-	//prim ²âÊÔ
+	//prim æµ‹è¯•
 	//list<Edge>* treeList = new list<Edge>;
 	//printf("%d\n", G->primBrute(/*root =*/ 0, treeList));
 	//G->printVetex();
@@ -54,29 +54,29 @@ int main(){
 	//printf("%d\n", G->primHeap(/*root =*/ 0, treeList));
 	//G->printVetex();
 
-	//kruskal²âÊÔ
+	//kruskalæµ‹è¯•
 	//printf("%d\n", G->kruskal(treeList));
 	//G->printVetex();
 
-	//bellman-Ford²âÊÔ
+	//bellman-Fordæµ‹è¯•
 	//G->bellmanFord(/*s =*/0);
 	//G->printVetex();
 
-	//warshall²âÊÔ
+	//warshallæµ‹è¯•
 	//G->warshall(/* print =*/ true);
 
-	//floyd²âÊÔ£¬Í¬Ê±»ñµÃ½éÊıÖĞĞÄ¶È
+	//floydæµ‹è¯•ï¼ŒåŒæ—¶è·å¾—ä»‹æ•°ä¸­å¿ƒåº¦
 	//G->floyd(/*print =*/ true);
-	//G->printVetex();//»ñµÃ½éÊıÖĞĞÄ¶È
-	//G->printAllminPath();//´òÓ¡ËùÓĞµã¶ÔÖ®¼äµÄ×î¶ÌÂ·¾¶
+	//G->printVetex();//è·å¾—ä»‹æ•°ä¸­å¿ƒåº¦
+	//G->printAllminPath();//æ‰“å°æ‰€æœ‰ç‚¹å¯¹ä¹‹é—´çš„æœ€çŸ­è·¯å¾„
 
-	//Ê÷¼ÆÊı²âÊÔ
+	//æ ‘è®¡æ•°æµ‹è¯•
 	//printf("spanning tree number:%d\n", G->countSpanningTree());
-	//ÓĞÏòÍ¼µÄ¸ùÊı£¬Ğò´Ó1¿ªÊ¼
+	//æœ‰å‘å›¾çš„æ ¹æ•°ï¼Œåºä»1å¼€å§‹
 	//printf("%d\n", G->spanningTreeFromRoot(/* root=*/1));
 
-	//ÉçÈº·¢ÏÖ²âÊÔ, ¶ÔÓÚÈºÌåĞÔÌØÕ÷²»Ã÷ÏÔµÄÍ¼£¬¿ÉÒÔ¼Ó´óµü´ú´ÎÊı
-	printf("modularity:%f \n", G->communityDetecting(/*iter=*/50));
+	//ç¤¾ç¾¤å‘ç°æµ‹è¯•, å¯¹äºç¾¤ä½“æ€§ç‰¹å¾ä¸æ˜æ˜¾çš„å›¾ï¼Œå¯ä»¥åŠ å¤§è¿­ä»£æ¬¡æ•°
+	printf("modularity:%f \n", G->communityDetecting(/*iter=*/32, /*thread_num=*/4));
 	G->printVetex();
 
 	delete G;
