@@ -2,8 +2,12 @@
 #include "Graph.h"
 #include "community.h"
 #include "unionSet.h"
+#include <omp.h>
+#include <iostream>
+#include <time.h>
+#include <iomanip>
 
-reducedNode* Graph::initReduceGraph(){//³õÊ¼»¯ĞÅÏ¢¼ò»¯µÄÍ¼,O(n+e)
+reducedNode* Graph::initReduceGraph(){//åˆå§‹åŒ–ä¿¡æ¯ç®€åŒ–çš„å›¾,O(n+e)
 	reducedNode* nodeVec = new reducedNode[n];
 	for(int i = 0 ;i < n; i ++){
 		nodeVec[i].community = i;
@@ -14,7 +18,7 @@ reducedNode* Graph::initReduceGraph(){//³õÊ¼»¯ĞÅÏ¢¼ò»¯µÄÍ¼,O(n+e)
 	return nodeVec;
 }
 
-//³õÊ¼»¯ÉçÈº£¬Í¬Ê±µÃµ½ËùÓĞ¶ÈµÄºÍm,O(e)
+//åˆå§‹åŒ–ç¤¾ç¾¤ï¼ŒåŒæ—¶å¾—åˆ°æ‰€æœ‰åº¦çš„å’Œm,O(e)
 Community* initCommunity(reducedNode* nodeVec, int n, int& m){
 	Community* com = new Community[n];
 	m = 0;
@@ -28,16 +32,16 @@ Community* initCommunity(reducedNode* nodeVec, int n, int& m){
 	return com;
 }
 
-//ÓÃÓÚqsortµÄcompare
+//ç”¨äºqsortçš„compare
 int comparereducedNode(const void* x, const void* y){
 	return (*(reducedNode*)x).community - (*(reducedNode*)y).community;
 }
 
-//ËõµãÖØ½¨Í¼O(ne)
+//ç¼©ç‚¹é‡å»ºå›¾O(ne)
 reducedNode* newGraph(reducedNode* old, int& lastcount){
-	//¶Ôcommunity×÷Ñ¹Ëõ
+	//å¯¹communityä½œå‹ç¼©
 	int* rank = new int[lastcount];
-	//ÅÅĞò
+	//æ’åº
 	qsort(old, lastcount, sizeof(reducedNode), comparereducedNode);
 	int r = 0; rank[old[0].community] = 0;
 	for(int i = 1; i < lastcount; i++){
@@ -47,24 +51,24 @@ reducedNode* newGraph(reducedNode* old, int& lastcount){
 	reducedNode* newnodeVec = new reducedNode[r+1];
 	for(int i = 0; i < lastcount; i++){
 		for(auto& edge : old[i].neighbor){
-			if(old[i].community != old[edge.to].community){//Á½Õß²»ÔÚÍ¬Ò»ÉçÈº£¬¾Í½«È¨ÖØÔö¼Ó
+			if(old[i].community != old[edge.to].community){//ä¸¤è€…ä¸åœ¨åŒä¸€ç¤¾ç¾¤ï¼Œå°±å°†æƒé‡å¢åŠ 
 				int j = rank[old[i].community], to = rank[old[edge.to].community], loc = -1, count = -1;
-				//ÔÚĞÂÍ¼ÖĞ¿´ÊÇ·ñÓĞ´Ë±ß
+				//åœ¨æ–°å›¾ä¸­çœ‹æ˜¯å¦æœ‰æ­¤è¾¹
 				for(auto& e : newnodeVec[j].neighbor){
 					count++;
 					if(e.to == to){loc = count; e.weight += edge.weight; break; }
 				}
-				if(loc == -1){//²»ÔÚ¾Í¼ÓĞÂ±ß
+				if(loc == -1){//ä¸åœ¨å°±åŠ æ–°è¾¹
 					newnodeVec[j].neighbor.push_back(reducedEdge(to, edge.weight));
 				}
-			}else{//ĞÎ³É×Ô»·
+			}else{//å½¢æˆè‡ªç¯
 				int j = rank[old[i].community], loc = -1, count = -1;
-				//ÔÚĞÂÍ¼ÖĞ¿´ÊÇ·ñÓĞ´Ë±ß
+				//åœ¨æ–°å›¾ä¸­çœ‹æ˜¯å¦æœ‰æ­¤è¾¹
 				for(auto& e : newnodeVec[j].neighbor){
 					count++;
 					if(e.to == j){loc = count; e.weight += edge.weight; break; }
 				}
-				if(loc == -1){//²»ÔÚ¾Í¼ÓĞÂ±ß
+				if(loc == -1){//ä¸åœ¨å°±åŠ æ–°è¾¹
 					newnodeVec[j].neighbor.push_back(reducedEdge(j, edge.weight));
 				}
 			}
@@ -75,10 +79,10 @@ reducedNode* newGraph(reducedNode* old, int& lastcount){
 	return newnodeVec;
 }
 
-//¼ÆËãÄ£¿é¶È
+//è®¡ç®—æ¨¡å—åº¦
 double modularity(reducedNode* nodeVec, int count, int m){//O(e)
 	double modu = 0.0;
-	//¼ÆËãÄ£¿é¶È
+	//è®¡ç®—æ¨¡å—åº¦
 	for(int i = 0; i < count; i++){
 		int sumin = 0, sumtot = 0;
 		for(auto& edge : nodeVec[i].neighbor){
@@ -90,75 +94,101 @@ double modularity(reducedNode* nodeVec, int count, int m){//O(e)
 	return modu;
 }
 
-//fastUnfolding(»ò³ÆLouvainËã·¨)ÉçÈº·¢ÏÖ£¬½«½ÚµãÖ®¼ä ¡°½Ï´óÈ¨ÖØ¡± µÄ¼¯ºÏ½øĞĞ¾ÛÀà, ·µ»ØÄ£¿é¶È
-unionSet* Graph::fastUnfolding(double& modu){//ÉçÈº·¢ÏÖËã·¨
-	reducedNode* nodeVec = initReduceGraph();//³õÊ¼»¯ĞÂÍ¼½Úµã
-	unionSet* set = new unionSet(n);//Îª»¹Ô­Ô­Í¼Ã¿¸ö½ÚµãËùÊôµÄÉçÈº£¬Ê¹ÓÃ²¢²é¼¯Î¬»¤
-	int count = n, s = 0, lastcount = n;//ÉçÈºÊıÁ¿(Ã¿´ÎºÏ²¢¼õÉÙÒ»¸ö), Í¼µÄ¶ÈºÍ(Ïàµ±ÓÚ2m)
-	bool flag = true;//ÅĞ¶ÏÊÇ·ñÓĞÉçÈººÏ²¢Çé¿ö³öÏÖ
-	while(flag){//Ã¿ÂÖO(n^2+e+ne) = O(n(n+e)),n eÎªĞÂÍ¼ÖĞµÄ¶¥µãºÍ±ß
+//fastUnfolding(æˆ–ç§°Louvainç®—æ³•)ç¤¾ç¾¤å‘ç°ï¼Œå°†èŠ‚ç‚¹ä¹‹é—´ â€œè¾ƒå¤§æƒé‡â€ çš„é›†åˆè¿›è¡Œèšç±», è¿”å›æ¨¡å—åº¦
+unionSet* Graph::fastUnfolding(double& modu, unsigned seed){//ç¤¾ç¾¤å‘ç°ç®—æ³•
+	unsigned long long next_random = seed;//éšæœºæ•°ç§å­
+	reducedNode* nodeVec = initReduceGraph();//åˆå§‹åŒ–æ–°å›¾èŠ‚ç‚¹
+	unionSet* set = new unionSet(n);//ä¸ºè¿˜åŸåŸå›¾æ¯ä¸ªèŠ‚ç‚¹æ‰€å±çš„ç¤¾ç¾¤ï¼Œä½¿ç”¨å¹¶æŸ¥é›†ç»´æŠ¤
+	int count = n, s = 0, lastcount = n;//ç¤¾ç¾¤æ•°é‡(æ¯æ¬¡åˆå¹¶å‡å°‘ä¸€ä¸ª), å›¾çš„åº¦å’Œ(ç›¸å½“äº2m)
+	bool flag = true;//åˆ¤æ–­æ˜¯å¦æœ‰ç¤¾ç¾¤åˆå¹¶æƒ…å†µå‡ºç°
+	while(flag){//æ¯è½®O(n^2+e+ne) = O(n(n+e)),n eä¸ºæ–°å›¾ä¸­çš„é¡¶ç‚¹å’Œè¾¹
 		flag = false;
-		Community* com = initCommunity(nodeVec, lastcount, s);//³õÊ¼»¯ÉçÈº
+		Community* com = initCommunity(nodeVec, lastcount, s);//åˆå§‹åŒ–ç¤¾ç¾¤
 		int* k_i_in = new int[lastcount];
-		//±éÀúÃ¿¸öµã
-		for(int i = 0; i < lastcount; i ++){
-			//¶ÔÃ¿¸öµãÏàÁÚµÄËùÓĞÉçÈº,¼ÆËã k_i ºÍ k_i_in
+		
+		//è€ƒè™‘éšæœºæ’åˆ—é€‰ç‚¹é¡ºåºï¼Œä½¿ç”¨shuffle,æ•ˆæœæ¯”éšæœºé€‰å–æœ€å¤§å€¼è¦å¥½
+		int* rank = new int[lastcount];
+		for(int i = 0; i < lastcount; i++)rank[i] = i;
+		for(int i = lastcount-1; i >= 0; i--){
+			next_random = ((next_random * 214013L + 2531011L) >> 16) & 0x7fff;
+			swap(rank[i], rank[next_random%(i+1)]);
+		}
+		
+		//éå†æ¯ä¸ªç‚¹
+		for(int k = 0; k < lastcount; k ++){
+			int i = rank[k];
+			//å¯¹æ¯ä¸ªç‚¹ç›¸é‚»çš„æ‰€æœ‰ç¤¾ç¾¤,è®¡ç®— k_i å’Œ k_i_in
 			memset(k_i_in, 0, lastcount * sizeof(int));
 			int k_i = 0, num = 0;
 			for(auto& edge : nodeVec[i].neighbor){
 				k_i += edge.weight;
-				if(i != edge.to)k_i_in[nodeVec[edge.to].community] += edge.weight;//²»°üÀ¨×Ô»·
+				if(i != edge.to)k_i_in[nodeVec[edge.to].community] += edge.weight;//ä¸åŒ…æ‹¬è‡ªç¯
 			}
-			//ÕÒµ½×î´óµÄk_i_in
+			//æ‰¾åˆ°æœ€å¤§çš„k_i_in
 			int max = 0, id = -1;
 			for(int j = 0; j < lastcount; j++){
 				if(j == i)continue;
-				//¿¼ÂÇµ½Êı¾İµÄ¾Ö²¿ĞÔ£¬±àºÅÏà½üµÄ½ÚµãÆä³ÉÎªÒ»¸öÉçÇøµÄ¸ÅÂÊÒ²¸ü´ó£¬ËùÒÔÕâÀï²ÉÓÃËæ»ú»¯·½·¨£¬±àºÅÔ½Ïà½üµÄµã±»½ÓÊÜµÄ¸ÅÂÊÔ½´ó
-				if(max < k_i_in[j] || (max == k_i_in[j] && (rand() % ( abs(j-i) )==0))){
+				//è€ƒè™‘åˆ°æ•°æ®çš„å±€éƒ¨æ€§ï¼Œç¼–å·ç›¸è¿‘çš„èŠ‚ç‚¹å…¶æˆä¸ºä¸€ä¸ªç¤¾åŒºçš„æ¦‚ç‡ä¹Ÿæ›´å¤§ï¼Œæ‰€ä»¥è¿™é‡Œé‡‡ç”¨éšæœºåŒ–æ–¹æ³•ï¼Œç¼–å·è¶Šç›¸è¿‘çš„ç‚¹è¢«æ¥å—çš„æ¦‚ç‡è¶Šå¤§
+				if(max < k_i_in[j] /*|| (max == k_i_in[j] && (rand() % ( abs(j-i) )==0))*/){
 					max = k_i_in[j];
 					id = j;
 				}
 			}
-			//ÅĞ¶Ï °Ñ½Úµãi´ÓÆäÔ­ÓĞÉçÈºÖĞÒÆ³ö£¬¼ÓÈëÉçÈºidÖ®ºóµÄ Ä£¿é¶È ÊÇ·ñÔö¼Ó,Ôö¼Ó¾Í»»ÉçÈº
-			//±ÈÂÛÎÄÔ­ÏÈÖ»¿¼ÂÇ¹ÂÁ¢µãµÄÇé¿ö½øĞĞÁË¸Ä½ø£¬×îÓÅ½â²»±ä£¬µ«¼«´óµØÔö¼ÓÁË»ñµÃ×îÓÅ½âµÄ¸ÅÂÊ£¬¼õÉÙÁËiterÂÖÊı
+			//åˆ¤æ–­ æŠŠèŠ‚ç‚¹iä»å…¶åŸæœ‰ç¤¾ç¾¤ä¸­ç§»å‡ºï¼ŒåŠ å…¥ç¤¾ç¾¤idä¹‹åçš„ æ¨¡å—åº¦ æ˜¯å¦å¢åŠ ,å¢åŠ å°±æ¢ç¤¾ç¾¤
+			//æ¯”è®ºæ–‡åŸå…ˆåªè€ƒè™‘å­¤ç«‹ç‚¹çš„æƒ…å†µè¿›è¡Œäº†æ”¹è¿›ï¼Œæœ€ä¼˜è§£ä¸å˜ï¼Œä½†æå¤§åœ°å¢åŠ äº†è·å¾—æœ€ä¼˜è§£çš„æ¦‚ç‡ï¼Œå‡å°‘äº†iterè½®æ•°
 			if(id >= 0 && max >= double(k_i_in[nodeVec[i].community]) + (2.0/double(s))*\
 					double(k_i*(k_i + com[id].sumTot - com[nodeVec[i].community].sumTot))+0.000001){
 				flag = true;
 				//printf("move %d from community %d to community %d\n", i, nodeVec[i].community, id);
-				com[nodeVec[i].community].sumTot -= k_i;//ÒÆ³öÔ­ÓĞÉçÈº
+				com[nodeVec[i].community].sumTot -= k_i;//ç§»å‡ºåŸæœ‰ç¤¾ç¾¤
 				com[nodeVec[i].community].sumIn -= k_i_in[nodeVec[i].community];
-				nodeVec[i].community = id;//¼ÓÈëĞÂÉçÈº
+				nodeVec[i].community = id;//åŠ å…¥æ–°ç¤¾ç¾¤
 				com[id].sumTot += k_i;
 				com[id].sumIn += max;
 				set->isolate(i);
 				set->Union(i, id);
 			}
 		}
-		//ÖØ½¨Í¼
+		//é‡å»ºå›¾
 		nodeVec = newGraph(nodeVec, lastcount);
 		delete[] k_i_in;
 		delete[] com;
+		delete[] rank;
 	}
 	modu = modularity(nodeVec, lastcount, s);
 	return set;
 }
 
-//ÓÉÓÚfastUnflodingÖĞ×î´óÖµÊÇËæ»úÑ¡È¡µÄ£¬ËùÒÔ½øĞĞiterÂÖ£¬ÒÔ±ãÑ¡È¡×îÓÅ½â
-double Graph::communityDetecting(int iter){
+//ç”±äºfastUnflodingä¸­æœ€å¤§å€¼æ˜¯éšæœºé€‰å–çš„ï¼Œæ‰€ä»¥è¿›è¡Œiterè½®ï¼Œä»¥ä¾¿é€‰å–æœ€ä¼˜è§£
+double Graph::communityDetecting(int iter, int threadnum){
 	double maxModu = -1.0, mo;
-	int k = 0;
-	srand(unsigned(time(NULL)));
-	unionSet* maxset = fastUnfolding(mo);
-	while(k++ < iter){
-		unionSet* set = fastUnfolding(mo);
-		printf("iter:%d, modularity:%f\n", k, mo);
-		if(maxModu < mo){
-			maxModu = mo;
-			delete maxset;
-			maxset = set;
-		}else delete set;
+	unionSet* maxset = fastUnfolding(mo, unsigned(time(NULL)));
+	//è¿™é‡Œå¯ä»¥é‡‡ç”¨å¹¶è¡Œè®¡ç®—
+#ifndef _OPENMP
+	cerr<<"OpenMP not supported"<<endl;
+	threadnum = 1;
+#endif
+	//éšæœºæ•°ç”Ÿæˆæ˜¯çº¿ç¨‹ä¸å®‰å…¨çš„ï¼Œåº”è¯¥å¯¹æ¯ä¸ªçº¿ç¨‹éƒ½ç»™å®šä¸€ç‰¹å®šç§å­
+	iter = iter / threadnum + 1;//iterå‡åˆ†ï¼Œä¸Šå–æ•´
+	clock_t x = clock();
+
+#pragma omp parallel for num_threads(threadnum)
+	for(int i = 0; i < threadnum; i++){
+		unsigned seed = omp_get_thread_num();
+		for(int k = 0; k < iter; k++){
+			seed = ((seed * 214013L + 2531011L) >> 16) & 0x7fff;
+			unionSet* set = fastUnfolding(mo, seed);
+			//printf("threadid:%d, iter:%d, modularity:%f\n", omp_get_thread_num(), k, mo);
+			if(maxModu < mo){
+				maxModu = mo;
+				delete maxset;
+				maxset = set;
+			}else delete set;
+		}
 	}
-	//ÎªÔ­Í¼Ã¿¸ö½ÚµãµÄÉçÈº¸³Öµ
+	clock_t y = clock();
+	cout<<setprecision(6)<<((y - x) / double(CLOCKS_PER_SEC))<<"s"<<endl;
+	//ä¸ºåŸå›¾æ¯ä¸ªèŠ‚ç‚¹çš„ç¤¾ç¾¤èµ‹å€¼
 	for(int i = 0; i < n; i++){
 		vertex[i].community = maxset->find(i) + 1;
 	}
