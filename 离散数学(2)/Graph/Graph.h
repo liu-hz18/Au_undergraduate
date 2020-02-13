@@ -7,42 +7,42 @@
 #include "unionSet.h"
 #include "community.h"
 
-//ÓĞÏòÍ¼Àà
+//æœ‰å‘å›¾ç±»
 class Graph{
 private:
-	int n, e;//¶¥µãÊıºÍ±ßÊı
-	Vertex* vertex;//¶¥µãÁĞ±í
-	vertexPT* vertexpt;//PTÍ¼ÓÃÓÚÅÅĞòµÄ¶¥µã
-	list<Edge>* edgeList;//ÁÚ½Ó±í
-	stack<int>** pathlist;//×î¶ÌÂ·¾¶µÄ¶şÎ¬¾ØÕóÌ×Á´±í
+	int n, e;//é¡¶ç‚¹æ•°å’Œè¾¹æ•°
+	Vertex* vertex;//é¡¶ç‚¹åˆ—è¡¨
+	vertexPT* vertexpt;//PTå›¾ç”¨äºæ’åºçš„é¡¶ç‚¹
+	list<Edge>* edgeList;//é‚»æ¥è¡¨
+	stack<int>** pathlist;//æœ€çŸ­è·¯å¾„çš„äºŒç»´çŸ©é˜µå¥—é“¾è¡¨
 	bool isDirected;
 	
-	void reset();//ÖØÖÃ·ÃÎÊ×´Ì¬
+	void reset();//é‡ç½®è®¿é—®çŠ¶æ€
 	
-	void BFS(int v, int& clock);//µ¥Á¬Í¨ÓòBFS
+	void BFS(int v, int& clock);//å•è¿é€šåŸŸBFS
 	
-	void DFS(int v, int& clock);//µ¥Á¬Í¨ÓòDFS
+	void DFS(int v, int& clock);//å•è¿é€šåŸŸDFS
 	
-	bool TSortOutdegree(int v, int& clock, stack<int>* S);//Áã³ö¶ÈËã·¨£¬DFS
+	bool TSortOutdegree(int v, int& clock, stack<int>* S);//é›¶å‡ºåº¦ç®—æ³•ï¼ŒDFS
 	
-	void getPath(int from, int to, int**path, int i, int j);//µİ¹éµÃµ½fromµ½to µÄ×î¶ÌÂ·
+	void getPath(int from, int to, int**path, int i, int j);//é€’å½’å¾—åˆ°fromåˆ°to çš„æœ€çŸ­è·¯
 	
-	void getBetweenCent(int** distMatrix, int** path);//µÃµ½½éÊıÖĞĞÄ¶È
+	void getBetweenCent(int** distMatrix, int** path);//å¾—åˆ°ä»‹æ•°ä¸­å¿ƒåº¦
 
-	void printPath(int from, int to, int** mat);//´òÓ¡ÈÎÒâÁ½µã¼ä×î¶ÌÂ·¾¶
+	void printPath(int from, int to, int** mat);//æ‰“å°ä»»æ„ä¸¤ç‚¹é—´æœ€çŸ­è·¯å¾„
 
-	int** listToMatrix();//ÁÚ½Ó±í×ªÁÚ½Ó¾ØÕó
+	int** listToMatrix();//é‚»æ¥è¡¨è½¬é‚»æ¥çŸ©é˜µ
 
-	reducedNode* initReduceGraph();//³õÊ¼»¯ĞÅÏ¢¼ò»¯µÄÍ¼
+	reducedNode* initReduceGraph();//åˆå§‹åŒ–ä¿¡æ¯ç®€åŒ–çš„å›¾
 
-	unionSet* fastUnfolding(double& modu);//ÉçÈº·¢ÏÖfastUnfoldingËã·¨
+	unionSet* fastUnfolding(double& modu, unsigned seed);//ç¤¾ç¾¤å‘ç°fastUnfoldingç®—æ³•
 
 public:
-	//ÊäÈë¶¥µã¸öÊı ºÍ ÊÇ·ñÊÇÓĞÏòÍ¼
+	//è¾“å…¥é¡¶ç‚¹ä¸ªæ•° å’Œ æ˜¯å¦æ˜¯æœ‰å‘å›¾
 	Graph(int _n, bool directed = true):n(_n), e(0), vertex(new Vertex[_n+1]), edgeList(new list<Edge>[_n+1]), isDirected(directed){
 		pathlist = new stack<int>*[n];
-		for(int i = 0; i < n; i++){ pathlist[i] = new stack<int>[n]; }//³õÊ¼»¯×î¶ÌÂ·¾¶
-		for(int i = 0; i < n; i++){ vertex[i].data = i; }//ÉèÖÃË÷Òı
+		for(int i = 0; i < n; i++){ pathlist[i] = new stack<int>[n]; }//åˆå§‹åŒ–æœ€çŸ­è·¯å¾„
+		for(int i = 0; i < n; i++){ vertex[i].data = i; }//è®¾ç½®ç´¢å¼•
 	}
 	~Graph(){
 		delete[] vertex;
@@ -53,63 +53,63 @@ public:
 		delete[] pathlist;
 	}
 	
-	void insertEdge(int from, int to, int w = 1);//ÓĞÏòÍ¼¼Ó±ß£¬Ö»ĞèÒª¼ÓÒ»¸ö±ß
+	void insertEdge(int from, int to, int w = 1);//æœ‰å‘å›¾åŠ è¾¹ï¼Œåªéœ€è¦åŠ ä¸€ä¸ªè¾¹
 	
-	bool existEdge(int f, int t);//(f, t)´æÔÚ±ß,O(n)
+	bool existEdge(int f, int t);//(f, t)å­˜åœ¨è¾¹,O(n)
 
-	void printVetex();//´òÓ¡¶¥µãĞÅÏ¢
+	void printVetex();//æ‰“å°é¡¶ç‚¹ä¿¡æ¯
 	
-	void printEdge();//´òÓ¡±ßĞÅÏ¢
+	void printEdge();//æ‰“å°è¾¹ä¿¡æ¯
 
-	void printSpanningTree();//Êä³ö×îĞ¡Ö§³ÅÊ÷µÄÊ÷±ß
+	void printSpanningTree();//è¾“å‡ºæœ€å°æ”¯æ’‘æ ‘çš„æ ‘è¾¹
 
-	void randomGraph(int _e, int w_max = 1);//¶Ôn¸ö¶¥µãµÄÍ¼Ëæ»ú²åÈëeÌõÕıÈ¨±ß, ÎŞÖØ±ßºÍ×Ô»·, ÓĞÕıÕûÊıÈ¨ÖØ
+	void randomGraph(int _e, int w_max = 1);//å¯¹nä¸ªé¡¶ç‚¹çš„å›¾éšæœºæ’å…¥eæ¡æ­£æƒè¾¹, æ— é‡è¾¹å’Œè‡ªç¯, æœ‰æ­£æ•´æ•°æƒé‡
 	
-	void bfs(int s);//È«Í¼bfs
+	void bfs(int s);//å…¨å›¾bfs
 	
-	void dfs(int s);//È«Í¼dfs
+	void dfs(int s);//å…¨å›¾dfs
 	
-	stack<int>* topoSortDFS(int s, bool print = false);//ÍØÆËÅÅĞò,»ùÓÚDFS,O(n+e)
+	stack<int>* topoSortDFS(int s, bool print = false);//æ‹“æ‰‘æ’åº,åŸºäºDFS,O(n+e)
 	
-	//ÁãÈë¶ÈËã·¨, Kahn.O(n+e), DAGÊ±·µ»ØÕ»£¬´ÓÕ»µ×µ½Õ»¶¥ÊÇtopoSort¡£²»ÊÇDAGÔò·µ»Ø¿ÕÕ»¡£
+	//é›¶å…¥åº¦ç®—æ³•, Kahn.O(n+e), DAGæ—¶è¿”å›æ ˆï¼Œä»æ ˆåº•åˆ°æ ˆé¡¶æ˜¯topoSortã€‚ä¸æ˜¯DAGåˆ™è¿”å›ç©ºæ ˆã€‚
 	stack<int>* topoSortKahn(bool print = false);
 
-	//ÇóÃ¿¸ö¶¥µã(¹¤Ğò)µÄ×îÔçÆô¶¯Ê±¼ä(Í¬Ê±Ò²ÊÇv1 - viµÄ×î³¤Â·¾¶£¬¼´Ó¦µÈ´ıÆäÖ®Ç°µÄËùÓĞ¹¤Ğò¶¼Íê³É²ÅÄÜ¿ªÊ¼±¾¹¤Ğò)
+	//æ±‚æ¯ä¸ªé¡¶ç‚¹(å·¥åº)çš„æœ€æ—©å¯åŠ¨æ—¶é—´(åŒæ—¶ä¹Ÿæ˜¯v1 - viçš„æœ€é•¿è·¯å¾„ï¼Œå³åº”ç­‰å¾…å…¶ä¹‹å‰çš„æ‰€æœ‰å·¥åºéƒ½å®Œæˆæ‰èƒ½å¼€å§‹æœ¬å·¥åº)
 	void earlistStartTime();
 
-	//±ØĞëÏÈµÃµ½×îÔçÆô¶¯Ê±¼ä²ÅÄÜµ÷ÓÃ±¾º¯Êı£¡£¡£¡
-	//ÇóÃ¿¸ö¶¥µã(¹¤Ğò)µÄ×îÍíÆô¶¯Ê±¼ä(Í¬Ê±Ò²ÊÇvi - vnµÄ×î³¤Â·¾¶£¬¼´²»ÄÜÔÙÍí£¬·ñÔò×îºóÒ»µÀ¹¤Ğò»áÑÓÎó)
+	//å¿…é¡»å…ˆå¾—åˆ°æœ€æ—©å¯åŠ¨æ—¶é—´æ‰èƒ½è°ƒç”¨æœ¬å‡½æ•°ï¼ï¼ï¼
+	//æ±‚æ¯ä¸ªé¡¶ç‚¹(å·¥åº)çš„æœ€æ™šå¯åŠ¨æ—¶é—´(åŒæ—¶ä¹Ÿæ˜¯vi - vnçš„æœ€é•¿è·¯å¾„ï¼Œå³ä¸èƒ½å†æ™šï¼Œå¦åˆ™æœ€åä¸€é“å·¥åºä¼šå»¶è¯¯)
 	void latestStartTime();
 	
-	int primBrute(int s, list<Edge>* result);//×îĞ¡Ö§³ÅÊ÷,ÆÓËØprim,O(n^2+e)
+	int primBrute(int s, list<Edge>* result);//æœ€å°æ”¯æ’‘æ ‘,æœ´ç´ prim,O(n^2+e)
 	
-	int primHeap(int s, list<Edge>* result);//prim¶ÑÓÅ»¯,O((n+e)logn)
+	int primHeap(int s, list<Edge>* result);//primå †ä¼˜åŒ–,O((n+e)logn)
 	
-	//×îĞ¡Ö§³ÅÊ÷£¬²¢²é¼¯°æ±¾ kruskal, O(eloge),·µ»Ø×îĞ¡Ö§³ÅÊ÷µÄ±ß¼¯
+	//æœ€å°æ”¯æ’‘æ ‘ï¼Œå¹¶æŸ¥é›†ç‰ˆæœ¬ kruskal, O(eloge),è¿”å›æœ€å°æ”¯æ’‘æ ‘çš„è¾¹é›†
 	int kruskal(list<Edge>* result);
 
-	//ÆÓËØdijkstra,ÕıÈ¨¾ØÕó, µ¥Ô´µãs×î¶ÌÂ·,O(n^2+e)
+	//æœ´ç´ dijkstra,æ­£æƒçŸ©é˜µ, å•æºç‚¹sæœ€çŸ­è·¯,O(n^2+e)
 	void dijkstraBrute(int s);
 	
-	void dijkstraHeap(int s);//dijkstra¶ÑÓÅ»¯,O((n+e)logn)
+	void dijkstraHeap(int s);//dijkstraå †ä¼˜åŒ–,O((n+e)logn)
 	
-	bool** warshall(bool print = false);//Çó¿É´ï¾ØÕó,O(n^3)
+	bool** warshall(bool print = false);//æ±‚å¯è¾¾çŸ©é˜µ,O(n^3)
 	
-	//ÎŞ¸ºÈ¨»ØÂ·£¬ÇóÈÎÒâÁ½µã¼ä×î¶ÌÂ·,O(n^3),µÃµ½½éÊıÖĞĞÄ¶ÈO(n^3),·µ»Ø¾àÀë¾ØÕó.Í¬Ê±»ñµÃ½éÊıÖĞĞÄ¶ÈbetCet
+	//æ— è´Ÿæƒå›è·¯ï¼Œæ±‚ä»»æ„ä¸¤ç‚¹é—´æœ€çŸ­è·¯,O(n^3),å¾—åˆ°ä»‹æ•°ä¸­å¿ƒåº¦O(n^3),è¿”å›è·ç¦»çŸ©é˜µ.åŒæ—¶è·å¾—ä»‹æ•°ä¸­å¿ƒåº¦betCet
 	int** floyd(bool print = false);
 	
-	//±ßÈ¨ÈÎÒâ,ÎŞ¸º»· µ¥Ô´s×î¶ÌÂ·, O(e)~O(ne).Èô´æÔÚ¸º»··µ»Øfalse.(¿ÉÒÔ¿´×÷SPFA)»ùÓÚBFS¿ò¼Ü
+	//è¾¹æƒä»»æ„,æ— è´Ÿç¯ å•æºsæœ€çŸ­è·¯, O(e)~O(ne).è‹¥å­˜åœ¨è´Ÿç¯è¿”å›false.(å¯ä»¥çœ‹ä½œSPFA)åŸºäºBFSæ¡†æ¶
 	bool bellmanFord(int s);
 
-	//»ñµÃ½ôÃÜÖĞĞÄ¶ÈcloCet,ÅÜn´Îdijkstra »ò bellmanFord, Ä¬ÈÏ Ã»ÓĞ¸ºÈ¨(hasNegEdge = false)
+	//è·å¾—ç´§å¯†ä¸­å¿ƒåº¦cloCet,è·‘næ¬¡dijkstra æˆ– bellmanFord, é»˜è®¤ æ²¡æœ‰è´Ÿæƒ(hasNegEdge = false)
 	void getCloseCet(bool hasNegEdge = false);
 
-	void printAllminPath();//´òÓ¡ËùÓĞµã¶ÔÖ®¼äµÄ×î¶ÌÂ·
+	void printAllminPath();//æ‰“å°æ‰€æœ‰ç‚¹å¯¹ä¹‹é—´çš„æœ€çŸ­è·¯
 
-	int countSpanningTree();//Ê÷¼ÆÊı
+	int countSpanningTree();//æ ‘è®¡æ•°
 
-	int spanningTreeFromRoot(int r);//ÓĞÏòÍ¼ÒÔrÎª¸ùµÄÒ¶ÏòÊ÷
+	int spanningTreeFromRoot(int r);//æœ‰å‘å›¾ä»¥rä¸ºæ ¹çš„å¶å‘æ ‘
 
-	double communityDetecting(int iter);//ÉçÈº·¢ÏÖ
+	double communityDetecting(int iter, int threadnum = 4);//ç¤¾ç¾¤å‘ç°
 
 };
