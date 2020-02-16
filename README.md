@@ -1,4 +1,4 @@
-# Au_undergraduate
+# my undergraduate projects
 Undergraduate Projects in THU-CST (Department of Computer Science & Technology)
 ## 目录
 
