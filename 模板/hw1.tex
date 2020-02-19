@@ -1,0 +1,80 @@
+\documentclass[UTF8, onecolumn, a4paper]{article}
+\usepackage{ctex}
+\usepackage{geometry}
+\usepackage{amsmath}
+\usepackage{multirow, multicol}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{lettrine}
+\usepackage{authblk}
+\usepackage{xcolor}%用于设置颜色
+\usepackage{fontspec}
+\geometry{left=3.0cm,right=3.0cm,top=2.0cm,bottom=3.0cm}
+
+\title{\textbf{Intermediate Macroeconomics PS1}}%———总标题
+\author{刘泓尊\quad 2018011446\quad 计84 \\ \texttt{liu-hz18@mails.tsinghua.edu.cn} }
+%\affil{Department of Computer Science, Tsinghua University}
+\date{2020.02}
+
+\begin{document}
+\maketitle
+
+\section{What counts as GDP?}
+\begin{description}
+\item[a.]不计入GDP。因为该汽车是使用过的， 在其生产并第一次售出之后就已经算入了GDP。
+\item[b.]车子的价格不计入GDP。理由同a；但是如果dealer提供的服务价值也包含在了\$3000中，则服务的价值计入GDP。
+\item[c.]计入GDP。是政府当年支出，属于GDP。
+\item[d.]计入GDP。助教提供了服务，属于GDP。
+\item[e.]计入GDP。是在国内进行的活动。
+\item[f.]不计入GDP。房屋是去年建造的，已经计入了去年的GDP，对当年没有贡献。
+\end{description}
+
+\section{Analysis}
+\begin{description}
+\item[a.]\quad
+\begin{description}
+\item[1960:]($15482.71\times180.67) / (121.19 \times 667.07) = 3445.93\%$
+\item[1980:]$(26113.12\times227.22) / (220.68 \times 981.24) = 2740.10\%$	\item[2014:]$(46405.25\times318.86) / (3862.92 \times 1364.27) = 280.82\%$
+\end{description}
+可见: 2014年美国总GDP与中国总GDP的比例缩小了10倍以上，所以中国正在追赶上美国。
+\item[b.]1960-1980:\quad
+\begin{description}
+\item[America:]$(26113.12\times227.22) / (25482.71\times180.67) = (1 + x)^{20}$\\
+解得$x = 3.83\%$ 
+\item[China:]$(220.68\times981.24) / (121.19\times667.07) = (1+x)^{20}$\\
+解得$x = 5.05\%$
+\end{description}
+\item[c.]\quad
+\begin{description}
+\item[America 2014:]$(26113.12\times227.22)\times(1+3.83\%)^34 = \$21,295,321.051$ million\\(actual: $\$14,796,778.015$ million)
+\item[China 2014:]($220.68\times981.24)\times(1+5.05\%)^34 = \$1,156,123.285$ million\\(actual: $\$5,270,065.868$ million)
+\end{description}
+\item[d.]$220.68\times981.24\times(1+5.05\%)^n = 227.22\times26113.12\times(1+3.83\%)^n$\\解得$n = 283.40$年\\
+故，预计中国会在$1980+283.40\approx2263$年赶上美国。
+\item[e.]1980-2014:\quad
+\begin{description}
+\item[America:]$(46405.25\times318.86) / (26113.12\times227.22) = (1 + x)^{34}$\\
+解得$x = 2.724\%$ 
+\item[China:]$(3862.92\times1364.27) / (220.68\times981.24) = (1+x)^{34}$\\
+解得$x = 9.843\%$\\
+$(3862.92\times1364.27)\times(1+9.843\%)^n = (46405.25\times318.86)\times(1+2.724\%)^n$\\解得$n = 15.41$年\\
+故，预计中国会在$2014+15.41\approx 2029$年赶上美国。
+\end{description}
+\item[f.]\quad
+\begin{center}
+\begin{tabular}{cccccc}
+	\hline
+	\textbf{Rate} && \multicolumn{2}{c}{GDP per capita} & \multicolumn{2}{c}{Population}  \\
+	\cline{2-6}
+	&& US & China & US & China \\
+	\hline
+	1960-1980&& 2.648\% & 3.042\% &  1.153\% & 1.948\% \\
+	1980-2014&& 2.917\%& 15.387\% & 1.709\% & 1.661\%  \\
+	\hline
+\end{tabular}
+\end{center}
+从表中可以看到，中国在1980-2014年人均GDP的增长率(15.387\%)显著高于美国同期指标，且明显高于中国的人口增长率，所以中美GDP总量的差距缩小主要是因为{\bfseries 中国人均GDP的增长}.
+\end{description}
+
+\end{document}
