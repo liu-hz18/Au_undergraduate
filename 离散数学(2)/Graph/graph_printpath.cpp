@@ -1,38 +1,40 @@
 
 #include "Graph.h"
 
-//´òÓ¡´Ófrom µ½to µÄ×î¶ÌÂ·
+//æ‰“å°ä»from åˆ°to çš„æœ€çŸ­è·¯
 void Graph::printPath(int from, int to, int** mat){
 	assert(0 <= from && from < n && 0 <= to && to < n && from != to);
 	printf("min path from (%d) to (%d): ", from+1, to+1);
-	stack<int> temp = pathlist[from][to];//±£´æ¸±±¾
+	stack<int> temp = pathlist[from][to];//ä¿å­˜å‰¯æœ¬
 	int v = from;
 	list<int> weight;
 	while(!temp.empty()){
 		int u = temp.top();
 		weight.push_back(mat[v][u]);
 		printf("%d ", u+1); temp.pop();
-		v = u;//(v,u) ±ßÈ¨
+		v = u;//(v,u) è¾¹æƒ
 	}
-	//´òÓ¡×î¶ÌÂ·¾¶ÉÏµÄ±ßÈ¨
+	//æ‰“å°æœ€çŸ­è·¯å¾„ä¸Šçš„è¾¹æƒ
 	printf(", edge weight: ");
-	for(auto it = ++weight.begin(); it != weight.end(); it++){
+	auto it = weight.begin();
+	it++;
+	for(; it != weight.end(); it++){
 		printf("%d ", *it);
 	}
 	putchar(10);
 }
 
-//´òÓ¡ËùÓĞµã¶ÔÖ®¼äµÄ×î¶ÌÂ·
+//æ‰“å°æ‰€æœ‰ç‚¹å¯¹ä¹‹é—´çš„æœ€çŸ­è·¯
 void Graph::printAllminPath(){
-	//Èç¹û»¹ÒªÊä³öÈ¨ÖØ£¬¾ÍÒªÔÙ´ÎÁÚ½Ó±í×ªÁÚ½Ó¾ØÕó
+	//å¦‚æœè¿˜è¦è¾“å‡ºæƒé‡ï¼Œå°±è¦å†æ¬¡é‚»æ¥è¡¨è½¬é‚»æ¥çŸ©é˜µ
 	int** mat = listToMatrix();
-	if(isDirected){//ÓĞÏòÍ¼
+	if(!isDirected){//æ— å‘å›¾
 		for(int i = 0; i < n; i++){
 			for(int j = 0; j < n; j++){
 				if(i != j)printPath(i, j, mat);
 			}
 		}
-	}else{//ÎŞÏòÍ¼
+	}else{//æœ‰å‘å›¾
 		for(int i = 0; i < n; i++){
 			for(int j = i+1; j < n; j++){
 				printPath(i, j, mat);
