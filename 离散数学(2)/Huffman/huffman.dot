@@ -1,0 +1,52 @@
+//Huffman树示例
+
+graph{//有向图，无向图用(graph)
+  //rankdir=TB;
+  19;
+  8;
+  11;
+  subgraph cluster_a {
+      label="10";
+      labelloc="b";
+      a;
+  }
+  6;
+  subgraph cluster_t {
+      label="00";
+      labelloc="b";
+      t;
+  }
+  subgraph cluster_squ {
+      label="01";
+      labelloc="b";
+      squar[label="\' \'"];
+  }
+  
+  3;
+  subgraph cluster_s {
+      label="111";
+      labelloc="b";
+      s;
+  }
+  subgraph cluster_c {
+      label="1100";
+      labelloc="b";
+      c;
+  }
+  subgraph cluster_e {
+      label="1101";
+      labelloc="b";
+      e;
+  }
+
+  19--8[];
+  19--11;
+  8--t;
+  8--squar;
+  11--a;
+  11--6;
+  6--3;
+  6--s;
+  3--c;
+  3--e;
+}
