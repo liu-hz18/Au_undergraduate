@@ -1,0 +1,681 @@
+\documentclass[UTF8, onecolumn, a4paper]{article}
+\usepackage{ctex}
+\usepackage{appendix}
+\usepackage{geometry}
+\usepackage{amsmath, amsthm}
+\usepackage{multirow, multicol}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{lettrine}
+\usepackage{authblk}
+\usepackage{xcolor, fontspec}%用于设置颜色
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{listings}%用于显示代码
+\geometry{left=3.0cm,right=3.0cm,top=2.0cm,bottom=2.0cm}
+
+\title{\textbf{离散数学:作业一}}%———总标题
+\author{刘泓尊\quad 2018011446\quad 计84}
+%\affil{Department of Computer Science, Tsinghua University}
+\date{}
+
+\begin{document}
+\maketitle 
+
+\lstset{%代码块全局设置
+	backgroundcolor=\color{red!3!green!3!blue!3},%代码块背景色为浅灰色
+	rulesepcolor= \color{gray}, %代码块边框颜色
+	breaklines=true,  %代码过长则换行
+	numbers=left, %行号在左侧显示
+	numberstyle= \small,%行号字体
+	%keywordstyle= \color{red},%关键字颜色
+	commentstyle=\color{gray}, %注释颜色
+	frame=shadowbox,%用方框框住代码块
+	xleftmargin=1em,
+	xrightmargin=0em,
+	tabsize=5,
+	%rulesepcolor=\color{red!20!green!20!blue!20},  %阴影颜色
+	keywordstyle={\color{blue!90!}\fontspec{Consolas Bold}},   %关键字颜色
+	commentstyle={\color{blue!70!black}\fontspec{Consolas Italic}},   %注释颜色
+	stringstyle=\color{orange!100!black}, %字符串颜色
+	numberstyle=\color{purple}, %行号颜色
+	%basicstyle=\ttfamily, %代码风格
+	basicstyle=\fontspec{Consolas},
+	showstringspaces=false,          % underline spaces within strings only  
+	showtabs=false,
+	captionpos=t, %文件标题位置
+	flexiblecolumns
+}
+
+\begin{description}
+\item[1.] 
+\begin{proof}
+以工厂为节点，工厂之间有联系则建边，构成无向图。\\
+a.假设每座工厂都只与其他3座工厂有联系，则总度数为
+$$\underset{v\in V(G)}{\sum}d(v) = 9 \times 3 = 27$$
+由性质1.1.1，图的度数和应为偶数，矛盾！\\
+故，不可能每座工厂都只与其他三座工厂有业务联系。\\
+b.假设只有4座工厂与偶数个工厂有业务联系，剩余5个工厂与奇数个工厂有联系，则总度数为
+$$\underset{v\in V(G)}{\sum}d(v) = 4 \times 2i + 5 \times(2j+1) = 2(4i+5j)+1$$
+上式为奇数，同样与性质1.1.1矛盾！\\
+故，不可能只有4座工厂与偶数个工厂有联系.
+\end{proof}
+\item[2.] 
+\begin{proof}
+	假设$G$中存在至少1个孤立节点，则至多有$n-1$个非孤立节点。由于$G$为简单图，不存在重边和自环，所以每个非孤立节点最多与$n-2$个非孤立节点相连，总边数
+	$$m = \frac{1}{2}\underset{v\in V(G)}{\sum}d(v) \leq \frac{1}{2}\underset{v\in V(G)}{\sum}(n-2) \leq \frac{1}{2}(n-1)(n-2)$$
+	与题设条件$$m > \frac{1}{2}(n-1)(n-2)$$矛盾!\\
+	故，$G$中不存在非孤立节点。
+\end{proof}
+\item[3.]
+\begin{proof}
+根据定义，有向完全图满足条件
+$$d^+(v_i)+d^-(v_i) = n-1,\quad v_i\in V(G)$$
+故
+\begin{equation}
+\begin{aligned}
+left - right &=
+\underset{v_i\in V(G)}{\sum}\left((d^+(v_i))^2 - (d^-(v_i))^2\right)\\ &= 
+\underset{v_i\in V(G)}{\sum}\left((d^+(v_i))^2 - (n-1-d^+(v_i))^2\right)\\
+&=\underset{v_i\in V(G)}{\sum}\left(2(n-1)d^+(v_i) - (n-1)^2\right)\\
+&=2(n-1)\underset{v_i\in V(G)}{\sum}d^+(v_i) - n(n-1)^2\\
+&=2(n-1)\frac{n(n-1)}{2} - n(n-1)^2\\
+&=0
+\end{aligned}
+\end{equation}
+即
+$$\underset{v_i\in V(G)}{\sum}(d^+(v_i))^2 = \underset{v_i\in V(G)}{\sum}(d^-(v_i))^2$$
+\end{proof}
+
+\item[4.]
+设$8L,5L,3L$的容器对应节点$(a,b,c)$,其中$a,b,c$分别依次对应三种容器。\\
+搜索思路:\\
+对状态进行转移与搜索(dfs)，当某一容器m非空且存在另一容器n不满时，就可以将水从m倒入n中，使得m空或者n满，以此作为一次状态转移；\\
+对各状态进行DFS之后可以得到如下图所示的解。解的路径就是操作的具体过程。\\
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.70\textwidth]{demo.png}
+\end{figure}
+$\bullet$附录(Appendix)给出了具体实现代码。
+
+\item[7.]
+同构。构造映射$f:G_a\rightarrow G_b$如下:
+\begin{center}
+	\begin{tabular}{ccccccc}
+	\hline
+		$v$ & $v_1$ & $v_2$ & $v_3$ &  $v_4$ & $v_5$ & $v_6$\\
+	\hline
+		$f(v)$&b & a& c & e & d & f  \\
+	\hline
+	\end{tabular}
+\end{center}
+\item[8.]\quad\\
+邻接矩阵：
+\begin{center}
+$\begin{pmatrix}
+	0 & 1 & 0 & 1 & 0 & 0\\
+	0 & 0 & 0 & 0 & 1 & 0\\
+	1 & 0 & 0 & 1 & 0 & 0\\
+	0 & 0 & 0 & 0 & 0 & 0\\
+	0 & 0 & 1 & 0 & 0 & 0\\
+	1 & 0 & 1 & 1 & 0 & 0
+\end{pmatrix}$
+\end{center}
+设边的顺序为$e_1 = (v_1, v_2), e_2 = (v_1, v_4), e_3 = (v_3, v_1), e_4 = (v_2, v_5), e_5 = (v_6, v_3), e_6 = (v_6, v_4), e_7 = (v_5, v_3), e_8 = (v_3, v_4), e_9 = (v_6, v_1)$\\
+关联矩阵：
+\begin{center}
+$\begin{pmatrix}
+1 & 1 & -1 & 0 & 0 & 0 & 0 & 0 & -1\\
+-1 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 1 & 0 & -1 & 0 & -1 & 1 & 0 \\
+0 & -1 & 0 & 0 & 0 & -1 & 0 & -1 & 0 \\
+0 & 0 & 0 & -1 & 0 & 0 & 1 & 0 & 0\\
+0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & 1
+\end{pmatrix}$
+\end{center}
+边列表：
+$$A = (1, 1, 3, 2, 6, 6, 5, 3, 6)$$
+$$B = (2, 4, 1, 5, 3, 4, 3, 4 ,1)$$
+正向表：
+$$A = (1, 3, 4, 6, 6, 7, 10)$$
+$$B = (2, 4, 5, 1, 4, 3, 3, 4 ,1)$$
+
+\item[Thinking.]
+完全二分图$K_{m, n}$何时为欧拉图?\\
+由于无向连通图$G$存在欧拉回路(是欧拉图)的充要条件是$G$中每个节点的度均为偶数。\\
+而完全二分图两子集$X, Y$中，$X$中节点度为$|Y|$,$Y$中节点度为$|X|$,故充要条件为：
+\begin{center}
+	$m, n$均为偶数
+\end{center}
+
+\item[2.]
+\begin{proof}
+假设$G$和$\overline{G}$均不是连通图\\
+设$G$存在连通支$G_1, G_2$,在$G$中任取节点$v_1, v_2$:\\
+$\bullet$若存在边$(v_1, v_2)$,则在$G_2$中取点$v_3$,$v_3$与$v_1,v_2$均不连通，由补图的定义，$\overline{G}$中$v_3$与$v_1, v_2$连通，则$\overline{G}$中$v_1$与$v_2$通过$v_3$连通。\\
+$\bullet$若不存在边$(v_1, v_2)$,则由补图的定义，$\overline{G}$中$v_1$与$v_2$通过$v_3$连通.\\
+由$v_1, v_2$的任意性知，$\overline{G}$连通。与假设矛盾！\\
+故$G$和$\overline{G}$至少有一个是连通图。
+\end{proof}
+
+\item[3.]
+\begin{proof}
+图$G$有两条最长道路$L_1, L_2$,其长度均为$l$,假设两条道路不相交，即两者没有公共顶点\\
+由于$G$为连通图，$L_1,L_2$中分别存在点$v_1, v_2$使得存在$v_1\rightarrow v_2$的道路，设该道路为$L$.\\
+$v_1$分$L_1$为两部分，一部分$L_{1a}$长度$\geq l/2$;同理，$v_2$分$L_2$为两部分，一部分$L_{2a}$长度$\geq l/2$，则取道路$L_{1a} \cup L_{2a} \cup L$，该道路长度$\geq l/2+l/2+1 = l+1$,与$L_1, L_2$是最长道路的假设矛盾！\\
+故若连通图最长道路不唯一，它们必定相交。
+\end{proof}
+
+\item[4.]
+\begin{proof}
+对顶点数n作归纳。\\
+\textbf{a.}$n = 4$时，$m\geq5$。\\
+若$G$中存在度为0或1的节点，则剩余3个节点的子图的度$\sum deg \geq4$，与简单图的边数矛盾。故$G$中节点$deg\geq2$.则$G$中回路只有两种形式:
+\begin{center}
+	\quad1.三角形回路\quad2.四边形回路
+\end{center}
+$\bullet$若为三角形回路，则$G$中剩下的一个顶点至少与此三角形有2条边，这两条边与原三角形两边构成四边形回路，三角形剩下的一条边就是弦$(Chord)$.\\
+\qquad$\bullet$若为正方形回路，则至少还有一条边，该边就是弦。\\
+\textbf{b.}假设对节点数$n-1$的图成立.\\
+\textbf{c.}对于节点数为$n$的图:\\
+\qquad$\bullet$若$G$中存在度为1的节点$v$，则将该节点及其所连边去除后，由归纳假设知命题成立.\\
+\qquad$\bullet$若$G$中存在度为2的节点$v$，设该节点所连点为$v_s, v_t$,则去除$v$及其所连边，并将$v_s, v_t$合并为一个节点，该图即为$n-1$的图$G'$，由归纳假设知$G'$存在带弦回路，还原为$G$后仍然是带弦回路。\\
+\quad$\bullet$否则，$G$中所有节点$deg\geq 3$，由例$2.1.3$结论可知，$G$中必含带弦回路。
+\end{proof}
+
+\item[6.]
+\begin{proof}[解]
+将图中房间设为顶点，同时增设外部节点$Out$,两节点之间边代表有门；构造新图$G$如下.\\
+问题转化为$G$中是否存在欧拉道路，由于$G$中存在度为奇的两个点$v_3,v_5$,由推论2.3.1得$G$中存在欧拉道路，所以存在一条路经过每个门一次。
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.35\textwidth]{demo2.png}
+\end{figure}
+\end{proof}
+
+\item[8.]
+\begin{proof}
+假设$G$不存在$H$回路，则由推论2.4.1，存在节点$v_i, v_j$使得$d(v_i) + d(v_j) < n$.\\
+考虑图$G' = G - {v_i, v_j}$,即图$G$删去节点$v_i, v_j$及其所连边的情况.\\
+一方面，$$m_{G'} = m - (d(v_i) + d(v_j)) > m - n \geq \frac{1}{2}(n-1)(n-2) + 2 - n = \frac{1}{2}(n-2)(n-3)$$
+另一方面，
+$$m_{G'} < m_{K_{n-2}} = \frac{1}{2}(n-2)(n-3)$$
+上述两式矛盾，所以$G$中存在$H$回路。
+\end{proof}
+
+\item[12.]
+\begin{proof}
+不能.\\
+将正方体的27个节点建模为二分图(或2-染色)，具体做法为:\\8个顶点和6个面的中心点归为点集$X$，12条棱中点和体中心点归为点集$Y$,那么相邻节点之间必为一个$X$,一个$Y$。\\
+而一个角的顶点为$X$，中心为$Y$,根据二分图的性质，从点集$X$走到点集$Y$中所经过路径长度必然为奇数；而遍历27个顶点仅一次只需要26步，是偶数，矛盾！\\
+所以不能实现.
+\end{proof}
+
+\item[13.]
+\begin{proof}[解]
+将4个坐标点连同原点建图，以坐标为节点，坐标之间的曼哈顿距离为边权，构建完全图$K_5$,如下图所示\\
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.4\textwidth]{demo3.png}
+\end{figure}
+问题转化为求下图的最短哈密顿回路，即TSP，采用分支与界法可以求得问题的解。\\
+1.将边权递增排序，初始界$d_0\leftarrow\infty$\\
+\begin{center}
+	\begin{tabular}{ccccccccccc}
+		\hline
+		$e_{ij}$ & $a_{25}$ & $a_{45}$ & $a_{35}$ &  $a_{12}$ & $a_{34}$ & $a_{23}$ & $a_{24}$ & $a_{13}$ & $a_{15}$ & $a_{14}$ \\
+		\hline
+		$w_{ij}$& 5 & 5 & 6 & 7 & 7 & 9 & 10 & 12 & 12 & 17\\
+		\hline
+	\end{tabular}
+\end{center}
+2. 边权序列 中依次选边进行$dfs$,直到选择$n$条边，判断是否构成$H$回路.
+\\求解过程如下:\\
+$\bullet$\quad$d(S_1) = d(a_{25}, a_{45}, a_{35}, a_{12}, a_{34}),$ it's not a $Hamiltonian\quad Circle$. if $a_{34}$ is replaced by $a_{23}, a_{24}, a_{13}, a_{15}, a_{14}$, it's still not a $Hamiltonian\quad Circle$. Likely, if $a_{12}$ is replaced by $a_{34} ,a_{23}, a_{24}, a_{13}, a_{15}$, it's still not a $Hamiltonian\quad Circle$.\\
+$\bullet$\quad$ d(S_2) = d(a_{25}, a_{45}, a_{12}, a_{34}, a_{23})$, it's not a $Hamiltonian\quad Circle$. Until\\ $d(S_3) = d(a_{25}, a_{45}, a_{12}, a_{34}, a_{13}) = 36$ , it's a $Hamiltonian\quad Circle$, $d_0\leftarrow36$.\\
+$\bullet$\quad$d(S_4) = d(a_{25}, a_{45}, a_{34}, ..., ...)$ are all not a  $Hamiltonian\quad Circle$.\\
+$\bullet$\quad$d(S_5) = d(a_{25}, a_{35}, a_{12}, a_{34}, a_{14}) = 42$, it's a $Hamiltonian\quad Circle$.\\
+类似的，继续进行下去得到的解会比36大，所以TSP问题的解是$$d(S_3) = d(a_{25}, a_{45}, a_{12}, a_{34}, a_{13}) = 36$$即行进路线为:
+$$(0, 0)\rightarrow(2, 5)\rightarrow(6, 6)\rightarrow(8 ,9)\rightarrow(9, 3)\rightarrow(0,0)$$
+最短路径长36.
+\end{proof}
+\item[15.]
+\begin{proof}[解]
+可以将5年的6个时间点看做节点，节点之间的有向边代表1台设备从一年用到另一年的总花费，形成$DAG$，最小花费即为该图从起点到终点的最短路径，使用最短路算法可以解决这个问题。1台设备累计花费为费用数组的前缀和，即$(1, 3, 6, 11, 17)$,建图如下:
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{demo4.png}
+\end{figure}
+\\对上图使用最短路算法，得到的最短路如下:
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{demo5.png}
+\end{figure}
+\\所以最少开支的方案为:\\
+第1年购买1台设备使用2年(花费5+1+2 = 8)，第3年购买1台设备使用3年(花费6+1+2+3 = 12)。总开支20。
+\end{proof}
+
+\item[16.]
+\begin{proof}[解]
+采用$Edmonds$最小权匹配求解中国邮路。
+\begin{figure}[h]
+	\centering
+	\subfigure{
+		\begin{minipage}[t]{0.3\linewidth}
+			\centering
+			\includegraphics[width=\textwidth]{demo7.png}
+			\caption{deg为奇}
+		\end{minipage}
+	}
+	\subfigure{
+		\begin{minipage}[t]{0.3\linewidth}
+			\centering
+			\includegraphics[width=\textwidth]{demo9.png}
+			\caption{最小权匹配}
+		\end{minipage}
+	}
+	\subfigure{
+		\begin{minipage}[t]{0.3\linewidth}
+			\centering
+			\includegraphics[width=\textwidth]{demo8.png}
+			\caption{中国邮路}
+		\end{minipage}
+	}
+\end{figure}
+\\1.找到图中度为奇的节点(图中红色节点)。\\
+2.对图中红色节点寻找在原图中的最短路，进行最小权匹配(图中红色边为选中的边)。\\
+3.将最小权匹配中选择的边设置为重边(图中绿色边)，得到欧拉图$G'$.\\
+4.\quad$G'$的一条欧拉回路就是解。\\
+\textbf{Conclusion}:中国邮路长度为$d = 50$,重复走的边为$1-2,2-3,4-5$.
+\end{proof}
+
+\item[17.]
+\begin{proof}[解]
+工序的PT图如下图所示:
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{demo6.png}
+\end{figure}
+\\对上图使用拓扑排序算法，得到工序的拓扑序为:
+\begin{center}
+	\begin{tabular}{cccccccccccc}
+		\hline
+		TopoRank &1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11\\
+		\hline
+		Vertex&1& 3& 7& 4 & 2 & 6 &10 &8&5&9& $END$ \\
+		\hline
+	\end{tabular}
+\end{center}
+关键路径如上图红色路径所示。\\得到工序3,5,10的最早启动时间为$$\pi(3) = 5, \pi(5) = 16, \pi(10) = 20$$
+最晚启动时间为$$\tau(3) = 5, \tau(5) = 16, \tau(10) = 25$$
+允许延误时间为$$t_3 = 0, t_5 =0,t_{10}=5$$
+\end{proof}
+
+\item[Thinking.]
+$\frac{1}{4}$国际象棋棋盘跳马问题?
+\begin{proof}
+原问题可转化为求解下图的哈密顿回路问题:
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\textwidth]{demo10.png}
+\end{figure}
+\\如图，删去$S=\{a,b,c,d\}$四个点，得到$G-S$.因为$$p(G-S) = 6 > |S| = 4$$故该图不存在哈密顿回路，所以跳马问题无解。
+\end{proof}
+
+\item[1.]
+\begin{proof}[解]
+设树有$n_1$个度为1的节点，总节点数为$n$，$k\geq3$时，由树的性质:
+$$n_1 + 2n_2 + 3n_3 + \cdots + kn_k = 2(n-1)$$
+$$n_1+n_2+n_3+\cdots+n_k = n$$
+联立以上两式，解得:
+$$n_1 = 2 + n_3 + \cdots (k-2)n_k = 2 + \sum_{i=3}^{k}(i-2)n_i,\quad k \geq 3$$
+$k=2$时，该树只有1个树根和2个孩子，度为1的节点有$2$个。综上,度为1的节点数:
+\begin{equation}
+n_1=
+\begin{cases}
+2&k = 2\\
+2 + \sum_{i=3}^{k}(i-2)n_i&k\geq3
+\end{cases}
+\end{equation}
+\end{proof}
+
+\item[4.]
+\begin{proof}[解]
+\textbf{a.}原图的$Laplacian$矩阵为:
+\begin{center}
+	$L(G) = \begin{pmatrix}
+	3 & -1 & 0 & -1 & -1\\
+	-1 & 4 & -1 & 0 & -2\\
+	0 & -1 & 4 & -2 & -1 \\
+	-1 & 0 & -2 & 4 & -1 \\
+	-1 & -2 & -1 & -1 & 5
+	\end{pmatrix}$
+\end{center}
+树的数目为:
+$$det(L') = det\left(
+\begin{array}{cccc}
+3 & -1 & 0 & -1\\
+-1 & 4 & -1 & 0\\
+0 & -1 & 4 & -2 \\
+-1 & 0 & -2 & 4 \\
+\end{array}
+\right) = 101$$
+
+\textbf{b.}$G/\{v_1,v_5\}$(缩点)的$Laplacian$矩阵:
+\begin{center}
+	$L(G/\{v_1,v_5\})=\begin{pmatrix}
+	6 & -3 & -1 & -2\\
+	-3 & 4 & -1 & 0\\
+	-1 & -1 & 4 & -2 \\
+	-2 & 0 & -2 & 4 
+	\end{pmatrix}$
+\end{center}
+必含$(v_1, v_5)$的树的数目:
+$$det(L') = det\left(
+\begin{array}{ccc}
+6 & -3 & -1\\
+-3 & 4 & -1\\
+-1 & -1 & 4
+\end{array}
+\right) =44 $$
+\textbf{c.} 
+$G-(v_1,v_5)$(删边)的$Laplacian$矩阵:
+\begin{center}
+	$L(G-(v_1,v_5))=\begin{pmatrix}
+	3 & -1 & 0 & -1 & -1\\
+	-1 & 4 & -1 & 0 & -2\\
+	0 & -1 & 4 & -2 & -1 \\
+	-1 & 0 & -2 & 3 & 0 \\
+	-1 & -2 & -1 & 0 & 4
+	\end{pmatrix}$
+\end{center}
+不含$(v_4, v_5)$的树的数目:
+$$det(L') = det\left(
+\begin{array}{cccc}
+3 & -1 & 0 & -1\\
+-1 & 4 & -1 & 0\\
+0 & -1 & 4 & -2 \\
+-1 & 0 & -2 & 3
+\end{array}
+\right) =  60$$
+\end{proof}
+
+\item[5.]
+\begin{proof}[解]
+\textbf{a.}原图的$Laplacian$矩阵为:
+\begin{center}
+	$L(G) = \begin{pmatrix}
+	0 & -1 & 0 & -1 & -1\\
+	0 & 2 & -1 & 0 & -1\\
+	0 & 0 & 3 & -1 & 0 \\
+	0 & 0 & -1 & 3 & 0 \\
+	0 & -1 & -1 & -1 & 2
+	\end{pmatrix}$
+\end{center}
+以$v_1$为根的根树的数目为:
+$$det(L') = det\left(
+\begin{array}{cccc}
+ 2 & -1 & 0 & -1\\
+ 0 & 3 & -1 & 0 \\
+ 0 & -1 & 3 & 0 \\
+ -1 & -1 & -1 & 2
+\end{array}
+\right) = 24$$
+
+\textbf{b.}$G-(v_1,v_5)$(删边)的$Laplacian$矩阵:
+\begin{center}
+	$L(G-(v_1,v_5))=
+	\begin{pmatrix}
+	0 & -1 & 0 & -1 & 0\\
+	0 & 2 & -1 & 0 & -1\\
+	0 & 0 & 3 & -1 & 0 \\
+	0 & 0 & -1 & 3 & 0 \\
+	0 & -1 & -1 & -1 & 1 
+	\end{pmatrix}$
+\end{center}
+以$v_1$为根，不含$(v_1, v_5)$的根树的数目:
+$$det(L') = det\left(
+\begin{array}{cccc}
+ 2 & -1 & 0 & -1\\
+ 0 & 3 & -1 & 0 \\
+ 0 & -1 & 3 & 0 \\
+ -1 & -1 & -1 & 1 
+\end{array}
+\right) = 8 $$
+\textbf{c.} 
+$G-(v_2,v_3)$(删边)的$Laplacian$矩阵:
+\begin{center}
+	$L(G-(v_2,v_3))=\begin{pmatrix}
+	0 & -1 & 0 & -1 & -1\\
+	0 & 2 & 0 & 0 & -1\\
+	0 & 0 & 2 & -1 & 0 \\
+	0 & 0 & -1 & 3 & 0 \\
+	0 & -1 & -1 & -1 & 2
+	\end{pmatrix}$
+\end{center}
+不含$(v_2, v_3)$的树的数目:
+$$det(L') = det\left(
+\begin{array}{cccc}
+2 & 0 & 0 & -1\\
+0 & 2 & -1 & 0 \\
+0 & -1 & 3 & 0 \\
+-1 & -1 & -1 & 2
+\end{array}
+\right) =  15$$
+必含$(v_2, v_3)$的，以$v_1$为根的根树的数目$$24 - 15 = 9$$
+\end{proof}
+
+\item[8.]
+\begin{proof}
+完全二分图$K_{m,n}$的$Laplacian$矩阵:
+\begin{center}
+	$L(G) = \begin{pmatrix}
+	nI_m & -B\\
+	-B^T & mI_n
+	\end{pmatrix}$
+\end{center}
+其中$B$为$(m\times n)$的全1矩阵。\\
+树的数目为:
+\begin{equation}
+\begin{aligned}
+det(L_{m+n,m+n}) &= det\left(nI_m\right)\cdot det\left(mI_n - B^T\frac{1}{n}I_{n-1}B\right) \\&= n^m\cdot det
+\begin{pmatrix}
+m - \frac{m}{n} & -\frac{m}{n} & \cdots & -\frac{m}{n} \\
+-\frac{m}{n} & m - \frac{m}{n} & \cdots & -\frac{m}{n}\\
+\vdots & \vdots & \ddots & \vdots \\
+-\frac{m}{n}& -\frac{m}{n} & \cdots& m - \frac{m}{n}
+\end{pmatrix} \\&= n^m\cdot \frac{m^{n-1}}{n} \\&= n^{m-1}m^{n-1}
+\end{aligned}
+\end{equation}
+\end{proof}
+
+\item[10.]
+\begin{proof}[解]
+\textbf{1.}
+$$B = (B_{11}, B_{12}) = 
+\left(\begin{array}{c|c}
+\begin{matrix}
+-1& 1 &0 &0 \\
+1& 0& 1& 0\\
+0 &-1& 0& 0 \\
+0 &0 &0 &-1
+\end{matrix}&
+\begin{matrix}
+0 &0 &1 &0\\
+0& 1& 0& 0\\
+-1& 0 &0 &-1\\
+1 &-1& 0 &0
+\end{matrix}
+\end{array}
+\right)
+$$
+$$B_{12}^{-1} = 
+\begin{pmatrix}
+0& 1 &0 &1 \\
+0 &1 &0 &0 \\
+1& 0& 0& 0 \\
+0& -1& -1& -1
+\end{pmatrix}
+$$
+以$\{e_3,e_4,e_6,e_7\}$为树边的基本回路矩阵:
+$$
+C_f = (I, -B_{11}^TB_{12}^{-T}) = 
+\begin{pmatrix}
+1& 0 &0 &0 &-1& -1 &1 &1\\
+0 &1 &0 &0 &0 &0 &-1& -1\\
+0& 0& 1& 0 &-1& -1& 0& 1\\
+0& 0& 0& 1& 1& 0& 0& -1
+\end{pmatrix}
+$$
+
+\textbf{2.}
+$$B = (B_{11}, B_{12}) = 
+\left(\begin{array}{c|c}
+\begin{matrix}
+-1& 0 &0 &0 \\
+1& 0& 1& 0\\
+0 &-1& 0& -1 \\
+0 &1 &-1 &0
+\end{matrix}&
+\begin{matrix}
+1 &0 &1 &0\\
+0& 1& 0& 0\\
+-1& 0 &0 &0\\
+0 &0& 0 &-1
+\end{matrix}
+\end{array}
+\right)$$
+
+$$B_{12}^{-1} = 
+\begin{pmatrix}
+	0& 0 &-1 &0 \\
+	0 &1 &0 &0 \\
+	1& 0& 1& 0 \\
+	0& 0& 0& -1
+\end{pmatrix}$$
+
+以$\{e_2,e_5,e_6,e_8\}$基本割集矩阵:
+$$S_f = (B_{12}^{-1}B_{11}, I) = 
+	\begin{pmatrix}
+	0& 1 &0 &1 &1& 0 &0 &0\\
+	1 &0 &1 &0 &0 &1 &0& 0\\
+	-1& -1& 0& -1 &0& 0& 1& 0\\
+	0& -1& 1& 0& 0& 0& 0& 1
+	\end{pmatrix}
+$$
+\end{proof}
+
+\item[14.]
+\begin{proof}[解]
+state act as a seat的字频统计:
+\begin{center}
+	\begin{tabular}{ccccccc}
+		\hline
+		char &c & e & s & t & ' ' & a\\
+		\hline
+		count&1& 2& 3& 4 & 4 & 5\\
+		\hline
+	\end{tabular}
+\end{center}
+$Huffman$树的构造及对应字符的编码如下:
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{demo11.png}
+\end{figure}
+\\二进制编码:
+\begin{center}
+	\begin{tabular}{ccccccc}
+		\hline
+		char &c & e & s & t & ' ' & a\\
+		\hline
+		code&1100& 1101& 111& 00 & 01 & 10\\
+		\hline
+	\end{tabular}
+\end{center}
+得到源字符串的$Huffman$编码为:
+$$11100100011010110110000011011101100111111011000$$
+编码长度$codelen=47$.
+\end{proof}
+
+\item[16.]
+\begin{proof}[解]
+对原图使用$Kruskal$算法，得到的最短树如下:(树边用红色标识)	
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\textwidth]{demo12.png}
+\end{figure}	
+\\最短树树边为$(v_1,v_8),(v_2,v_4),(v_4,v_1),(v_4,v_3),(v_5,v_7),(v_7,v_6),(v_8,v_7)$，总权$22$.
+\end{proof}
+
+\item[3.]
+\begin{proof}
+假设$G$和$\overline{G}$均为平面图，则
+$$|E(G)| \leq 3n-6$$
+$$|E(\overline{G})| \leq 3n-6 $$
+故$$|E(G)| + |E(\overline{G})| = |E(K_n)| = \frac{n(n-1)}{2}\leq6n-12$$
+解得$$3\leq n\leq 10$$
+与$n > 10$矛盾！\\所以节点数大于10的简单图中，$G$和$\overline{G}$至少有一个是非平面图。
+\end{proof}
+
+\item[7.]
+\begin{proof}
+假设存在这样的平面图$G$满足题设性质。\\
+由于$G$为平面图，则其存在唯一的对偶图$G^*$。根据题设，$G^*$有5个节点，两两节点之间至少有一个边，即$G^*$存在$K_5$子图，故$G^*$不是平面图，故$G^*$不存在对偶图。\\与$(G^*)^* = G$矛盾！\\
+故不存在5个域的平面图，每个域之间至少有一条公共边界。
+\end{proof}
+
+
+\end{description}
+
+\begin{appendices}
+\section{Appendix}
+\begin{lstlisting}[language={c++}, title={test.cpp}] 
+bool state[9][6][4] = {0};//标记此状态是否到达过
+stack<Node> S;
+bool dfs(int a, int b, int c){//搜索+剪枝
+	state[a][b][c] = 1; S.push(Node(a, b, c));//用栈保存搜索结果
+	printf("%d,%d,%d\n", a, b, c);
+	if(a == 4 && b == 4 && c == 0)return true;
+	if(a > 0){//对可行分支进行搜索
+		if(b < 5){
+			int change = min(5-b, a);
+			if(!state[a-change][b+change][c] && dfs(a - change, b + change, c))return true;
+		}
+		if(c < 3){
+			int change = min(3-c, a);
+			if(!state[a-change][b][c+change] && dfs(a - change, b, c + change))return true;
+		}
+	}
+	if(b > 0){
+		if(a < 8){
+			int change = min(8-a, b);
+			if(!state[a+change][b-change][c] && dfs(a + change, b - change, c))return true;
+		}
+		if(c < 3){
+			int change = min(3-c, b);
+			if(!state[a][b-change][c+change] && dfs(a, b - change, c + change))return true;
+		}
+	}
+	if(c > 0){
+		if(b < 5){
+			int change = min(5-b, c);
+			if(!state[a][b+change][c-change] && dfs(a, b + change, c - change))return true;
+		}
+		if(a < 8){
+			int change = min(8-a, c);
+			if(!state[a+change][b][c-change] && dfs(a + change, b, c - change))return true;
+		}
+	}
+	S.pop();
+	return false;
+}
+int main(){
+	run(8, 0, 0);
+	//在此处打印栈S的内容即可
+	return 0;
+}
+
+\end{lstlisting}
+\end{appendices}
+
+\end{document}
