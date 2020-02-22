@@ -7,9 +7,9 @@ int main(){
 	int n, m;
 	scanf("%d%d", &n, &m);
 	//无向图
-	Graph* G = new Graph(n, /*isDirect =*/ false);
+	//Graph* G = new Graph(n, /*isDirect =*/ false);
 	//有向图
-	//Graph* G = new Graph(n, /*isDirect =*/ true);
+	Graph* G = new Graph(n, /*isDirect =*/ true);
 	int f, t, w;
 	//手动加边
 	for(int i = 0; i < m; i++){
@@ -43,20 +43,25 @@ int main(){
 	//获得紧密中心度
 	//G->getCloseCet(/*hasNegEdge =*/ false);
 
+
+	//最短树算法，注意！！使用Prim算法可以找出以v_i为根的最短树，但不一定是总权最短的树，因为可以以其他节点为根
 	//prim 测试
-	//list<Edge>* treeList = new list<Edge>;
+	list<Edge>* treeList = new list<Edge>;
 	//printf("%d\n", G->primBrute(/*root =*/ 0, treeList));
 	//G->printVetex();
 	//G->printEdge();
-	//G->printSpanningTree();
+	//G->printSpanningTree(treeList);
 
 	//treeList->clear();
-	//printf("%d\n", G->primHeap(/*root =*/ 0, treeList));
+	//printf("%d\n", G->primHeap(/*root =*/ 1-1, treeList));
 	//G->printVetex();
+	//G->printSpanningTree(treeList);
 
+	//Kruskal可以实现以全局最短树的寻找，因为该算法以边为单位。(不一定只有一个树根！！也就是可以存在反边)
 	//kruskal测试
-	//printf("%d\n", G->kruskal(treeList));
-	//G->printVetex();
+	printf("%d\n", G->kruskal(treeList));
+	G->printVetex();
+	G->printSpanningTree(treeList);
 
 	//bellman-Ford测试
 	//G->bellmanFord(/*s =*/0);
@@ -76,8 +81,8 @@ int main(){
 	//printf("%d\n", G->spanningTreeFromRoot(/* root=*/1));
 
 	//社群发现测试, 对于群体性特征不明显的图，可以加大迭代次数
-	printf("modularity:%f \n", G->communityDetecting(/*iter=*/32, /*thread_num=*/4));
-	G->printVetex();
+	//printf("modularity:%f \n", G->communityDetecting(/*iter=*/32, /*thread_num=*/4));
+	//G->printVetex();
 
 	delete G;
 	return 0;
