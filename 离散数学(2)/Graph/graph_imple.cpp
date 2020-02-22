@@ -1,7 +1,7 @@
 
 #include "Graph.h"
 
-//ÖØÖÃ·ÃÎÊ×´Ì¬
+//é‡ç½®è®¿é—®çŠ¶æ€
 void Graph::reset(){
 	for(int i = 0;i < n;i ++){
 		vertex[i].reset();
@@ -11,20 +11,20 @@ void Graph::reset(){
 	}
 }
 
-//ÓĞÏòÍ¼¼Ó±ß£¬Ö»ĞèÒª¼ÓÒ»¸ö±ß
+//æœ‰å‘å›¾åŠ è¾¹ï¼Œåªéœ€è¦åŠ ä¸€ä¸ªè¾¹
 void Graph::insertEdge(int from, int to, int w){
 	edgeList[from].push_back(Edge(to, w));
 	vertex[from].outDegree ++;
 	vertex[to].inDegree ++;
 	e++;
-	//Èç¹ûÊÇÎŞÏòÍ¼
+	//å¦‚æœæ˜¯æ— å‘å›¾
 	if(!isDirected){
 		edgeList[to].push_back(Edge(from, w));
 	}
-	//ÎŞÏòÍ¼µÄ¶ÈÊıÖ»ĞèÒªinDegree + outDegree¼´¿É
+	//æ— å‘å›¾çš„åº¦æ•°åªéœ€è¦inDegree + outDegreeå³å¯
 }
 
-//(f, t)´æÔÚ±ß
+//(f, t)å­˜åœ¨è¾¹
 bool Graph::existEdge(int f, int t){
 	for(auto& iter:edgeList[f]){
 		if(iter.to == t)return true;
@@ -32,7 +32,7 @@ bool Graph::existEdge(int f, int t){
 	return false;
 }
 
-//´òÓ¡¶¥µãĞÅÏ¢(×ÖµäĞÎÊ½Êä³ö£¬±ãÓÚpython½âÎö£¬¶ÔÃ¿ĞĞµÄ×Ö·û´®Ê¹ÓÃeval()º¯Êı¼´¿É£¬·µ»Ø×Öµä)
+//æ‰“å°é¡¶ç‚¹ä¿¡æ¯(å­—å…¸å½¢å¼è¾“å‡ºï¼Œä¾¿äºpythonè§£æï¼Œå¯¹æ¯è¡Œçš„å­—ç¬¦ä¸²ä½¿ç”¨eval()å‡½æ•°å³å¯ï¼Œè¿”å›å­—å…¸)
 void Graph::printVetex(){
 	for(int i = 0; i < n; i++){
 		printf("{'data':%d, 'dTime':%d, 'fTime':%d, 'parent':%d, 'inDegree':%d, 'outDegree':%d, 'priority':%d, 'state':%d, 'betCet':%d, 'cloCet':%d, 'topoRank':%d, 'earTime':%d, 'latTime':%d, 'community':%d}\n", \
@@ -42,7 +42,7 @@ void Graph::printVetex(){
 	putchar(10);
 }
 
-//´òÓ¡±ßĞÅÏ¢(¿ÉÒÔÓÃÓÚÊä³öÖ§³ÅÊ÷½á¹¹)
+//æ‰“å°è¾¹ä¿¡æ¯(å¯ä»¥ç”¨äºè¾“å‡ºæ”¯æ’‘æ ‘ç»“æ„)
 void Graph::printEdge(){
 	for(int i = 0; i < n; i++){
 		for(auto& it : edgeList[i]){
@@ -56,17 +56,22 @@ void Graph::printEdge(){
 	putchar(10);
 }
 
-//Êä³ö×îĞ¡Ö§³ÅÊ÷Ê÷±ß
-void Graph::printSpanningTree(){
+//è¾“å‡ºæœ€å°æ”¯æ’‘æ ‘æ ‘è¾¹
+void Graph::printSpanningTree(list<Edge>* treeList){
+	/*
 	for(int i = 0; i < n; i++){
-		printf("TREE EDGE:(%d, %d)\n", vertex[i].parent, i);
+		printf("TREE EDGE:(%d, %d)\n", vertex[i].parent+1, i+1);
+	}
+	*/
+	for(auto& edge : *treeList){
+		printf("TREE EDGE:(%d,%d)\n", edge.data+1, edge.to+1);
 	}
 }
 
-//ÁÚ½Ó±í×ªÁÚ½Ó¾ØÕó,Ã»ÓĞÏàÁ¬µÄ±ßÔòÎªÎŞÇî
+//é‚»æ¥è¡¨è½¬é‚»æ¥çŸ©é˜µ,æ²¡æœ‰ç›¸è¿çš„è¾¹åˆ™ä¸ºæ— ç©·
 int** Graph::listToMatrix(){
-	int** distMatrix = new int*[n];//×îĞ¡¾àÀë¾ØÕó
-	for(int i = 0; i < n; i++){//³õÊ¼»¯
+	int** distMatrix = new int*[n];//æœ€å°è·ç¦»çŸ©é˜µ
+	for(int i = 0; i < n; i++){//åˆå§‹åŒ–
 		distMatrix[i] = new int[n];
 		for(int j = 0; j < n; j++)distMatrix[i][j] = INT_MAX;
 	}
