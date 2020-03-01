@@ -22,5 +22,5 @@ Undergraduate Projects in THU-CST (Department of Computer Science & Technology)
 |2020.1-2020.6|人工智能导论|n皇后(局部搜索),重力四子棋,拼音输入法|
 |2020.1-2020.6|物理实验B(2)|实验报告(latex)|
 |2020.1-2020.6|数字逻辑电路|---|
-|2020.1-2020.6|数字逻辑实验|---|
+|2020.1-2020.6|数字逻辑电路实验|CPLD实验(VHDL)|
 
