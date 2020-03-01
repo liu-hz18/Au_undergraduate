@@ -1,5 +1,5 @@
 # my undergraduate projects
-Undergraduate Projects in THU-CST (Department of Computer Science & Technology)
+Undergraduate Projects in THU-CST (Department of Computer Science & Technology, Tsinghua University)
 ## 目录
 
 | 时间 | 课程                    | 内容 |
