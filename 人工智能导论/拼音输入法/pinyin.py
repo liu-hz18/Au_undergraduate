@@ -70,7 +70,7 @@ def run_translator(inputfile, outputfile):
 
 
 if __name__ == '__main__':
-    # python ./input.txt ./output.txt ./answer.txt
+    # python pinyin.py ./input.txt ./output.txt ./answer.txt
     if len(sys.argv) < 2:
         printhelp()
     elif sys.argv[1] == '-h' or sys.argv[1] == '-help':
