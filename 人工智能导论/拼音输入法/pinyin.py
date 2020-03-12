@@ -38,11 +38,26 @@ def get_accuracy():
 def printhelp():
     print(" If you HAVE NOT preprocessed data, please run:")
     print("      python -p")
-    print("\n Attention:\n  This preprocess will takes for about 30 mins and 5GB memory!!!")
+    print("\n Attention:\n  This Preprocess will takes for about 30 mins and 5GB Runtime memory!!!")
     print("\n If you HAVE preprocessed data, please run:")
     print("      python pinyin.py inputfile outputfile [answerfile]")
     print("\n A simple demo is:")
     print("      python pinyin.py ./input.txt ./output.txt ./answer.txt")
+
+
+def printproinfo():
+    print("Begin preprocess data...The whole process takes about 30 mins and 5GB Runtime Memory !!!")
+    print('It will create files as below:')
+    print('   |      File Name      ...Memory ... Total: 2GB')
+    print('./sina_news_vocab')
+    print('   |----corpus.txt       ...1.5GB')
+    print('   |----vocab.txt        ...62KB')
+    print('   |----vocab2id.json    ...100KB')
+    print('   |----char2gram.mat    ...33MB')
+    print('   |----top2gram.txt     ...18MB')
+    print('   |----weightmat.mat    ...33MB')
+    print('   |----count_3gram.txt  ...19MB')
+    print('   |----pinyin2char.json ...75KB')
 
 
 def preprocessdata():
@@ -70,14 +85,15 @@ def run_translator(inputfile, outputfile):
 
 
 if __name__ == '__main__':
-    # python pinyin.py ./input.txt ./output.txt ./answer.txt
+    # python ./input.txt ./output.txt ./answer.txt
+    print('')
     if len(sys.argv) < 2:
         printhelp()
     elif sys.argv[1] == '-h' or sys.argv[1] == '-help':
         printhelp()
     elif sys.argv[1] == '-p':
-        print("Begin preprocess data...The whole process takes about 30 mins and 5GB Memory !!!")
-        print("continue? [y/n]", end=' ')
+        printproinfo()
+        print("\ncontinue? [y/n]", end=' ')
         s = input()
         if s == 'y':
             preprocessdata()

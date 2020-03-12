@@ -96,8 +96,17 @@ def vitebi(sentence, outputfile):
     # 处理</eos>
     flagj = 0
     for j in range(len(lastcandidate)):
-        if dp[t][0] < dp[t-1][j] * weightmat[vocab2id[lastcandidate[j]]][vocab2id["</eos>"]]:
-            dp[t][0] = dp[t-1][j] * weightmat[vocab2id[lastcandidate[j]]][vocab2id["</eos>"]]
+        last = vocab2id[lastcandidate[j]]
+        cur = vocab2id['</eos>']
+        factor = weightmat[last][cur]
+        for k in range(len(lastlastcandidate)):
+            lastlast = vocab2id[lastlastcandidate[k]]
+            if (lastlast, last, cur) in count_3gram:
+                factor += top2gram[(lastlast, lastlast)] / 100000000
+                if mem[t-2][j] == k:
+                    factor += count_3gram[(lastlast, last, cur)] / top2gram[(lastlast, last)]
+        if dp[t][0] < dp[t-1][j] * factor:
+            dp[t][0] = dp[t-1][j] * factor
             flagj = j
     # 回溯找到最优解
     while t > 1:

@@ -3,11 +3,11 @@ import pypinyin
 import re
 from zhon.hanzi import punctuation
 
-suffix = "nor"
+suffix = "oral"
 srcfilepath = "./src_" + suffix + ".txt"
 inputfile = "./input_" + suffix + ".txt"
 answerfile = "./answer_" + suffix + ".txt"
-punctuation += "0123456789ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.%!()【】（）.．/~`●；：:;+-*/\n\t\r"
+punctuation += "0123456789ABCDEFGHIGKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.%!()【】（）.．/~`●；：:;\n\t\r"
 
 
 def modify(sentence):
@@ -15,7 +15,7 @@ def modify(sentence):
         sentence = sentence[:-1]
     sentence = re.sub(r"[%s]+" % punctuation, "-", sentence)
     sentence = re.sub(r'\[', '-', sentence)
-    sentence = re.sub(r']', '-', sentence)
+    sentence = re.sub(r']', '-', sentence).replace(' ', "").strip()
     sentencelist = sentence.split('-')
     return sentencelist
 
@@ -32,14 +32,16 @@ def create_test():
             newline.extend(linelist)
     # print(newline)
     # 生成对应拼音
+    '''
     with open(inputfile, 'w+', encoding='utf-8') as f:
         for line in newline:
             if len(line) > 4:
                 f.write(' '.join([item[0] for item in pypinyin.pinyin(line, style=pypinyin.NORMAL)]) + '\n')
+    '''
     with open(answerfile, 'w+', encoding='utf-8') as f:
         for line in newline:
-            if len(line) > 4:
-                f.write(line + "\n")
+            if len(line) > 8:
+                f.write(line.strip() + "\n")
 
 
 if __name__ == '__main__':
