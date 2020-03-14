@@ -1,4 +1,5 @@
 # my undergraduate projects
+![](https://img.shields.io/github/repo-size/Trinkle23897/Undergraduate.svg?style=flat)
 Undergraduate Projects in THU-CST (Department of Computer Science & Technology, Tsinghua University)
 ## 目录
 
