@@ -5,7 +5,7 @@ from char2corpus import read_save_vocab
 from char2gram import char_2gram, get_top_2gram
 from char3gram import char_3gram
 from initmat import get_weight_mat, read_pinyin_candidate
-from run import load_model, vitebi
+from run import load_model, vitebi_2gram, vitebi_3gram
 
 
 # 统计字正确率
@@ -80,7 +80,8 @@ def run_translator(inputfile, outputfile):
         for line in f.readlines():
             count += 1
             print("translate sentence:", count, end='\r')
-            vitebi(line, outputfile)
+            vitebi_2gram(line, outputfile)
+            #vitebi_3gram(line, outputfile)
     print("Finished!")
 
 
