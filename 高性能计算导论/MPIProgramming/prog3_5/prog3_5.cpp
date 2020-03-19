@@ -118,14 +118,14 @@ void run_col(int n, double* matrix, double* vector) {
         ser_tot = MPI_Wtime() - ser_tot;
         result = new double[n];
     }
-    MPI_Barrier(comm);
-
     loc_res = new double[n];
+    
+    MPI_Barrier(comm);
     beg_t[0] = MPI_Wtime();
     MPI_Scatter(matrix, 1, col_t, loc_A, n * local_n, MPI_DOUBLE, 0, comm);
     MPI_Scatter(vector, local_n, MPI_DOUBLE, loc_vec, local_n, MPI_DOUBLE, 0, comm);
-    beg_t[1] = MPI_Wtime();
     
+    beg_t[1] = MPI_Wtime();
     for(int i = 0; i < n; i++){
         loc_res[i] = 0.0;
         for(int j = 0; j < local_n; j++){
