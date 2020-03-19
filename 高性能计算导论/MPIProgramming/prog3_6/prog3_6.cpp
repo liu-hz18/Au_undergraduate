@@ -176,28 +176,26 @@ void run_submat(int n, double* matrix, double* vector){
     sub_y = new double[loc_m];
     double beg_t[2] = {0.0, 0.0}, tot[2] = {0.0, 0.0};
     double ser_tot;
-
-    MPI_Barrier(comm);
+    
     if(my_diag_rank == 0) {
         gen_matrix(n, &matrix);
         gen_vector(n, &vector);
         ser_tot = MPI_Wtime();
         serial(n, matrix, vector, &serial_res);
         ser_tot = MPI_Wtime() - ser_tot;
-        MPI_Scatterv(matrix, counts, disp, submat_mpi_t, loc_A, loc_m * loc_n, MPI_DOUBLE, 0, comm);
-    } else {
-        MPI_Scatterv(matrix, counts, disp, submat_mpi_t, loc_A, loc_m * loc_n, MPI_DOUBLE, 0, comm);
     }
+
+    MPI_Barrier(comm);
     beg_t[0] = MPI_Wtime();
+    MPI_Scatterv(matrix, counts, disp, submat_mpi_t, loc_A, loc_m * loc_n, MPI_DOUBLE, 0, comm);
     if(my_diag_rank == 0){
         MPI_Scatter(vector, loc_n, MPI_DOUBLE, loc_x, loc_n, MPI_DOUBLE, 0, diag_comm);
     } else if (diag) {
         MPI_Scatter(vector, loc_n, MPI_DOUBLE, loc_x, loc_n, MPI_DOUBLE, 0, diag_comm);
     }
-
     MPI_Bcast(loc_x, loc_n, MPI_DOUBLE, coords[1], col_comm);
+    
     beg_t[1] = MPI_Wtime();
-
     //matirx-vectoe multiply
     for(int i = 0; i < loc_m; i++){
         sub_y[i] = 0.0;
@@ -223,8 +221,8 @@ void run_submat(int n, double* matrix, double* vector){
         printf("time (with MPI_Scatter/MPI_Reduce)            %.6lfs\n", tot[0]);
         printf("time (without MPI_Scatter/MPI_Reduce)         %.6lfs\n", tot[1]);
         printf("time (Scatter&Reduce)                         %.6lfs\n", tot[0] - tot[1]);
-        printf("Speedup ratio(with MPI_Scatter/MPI_Reduce)    %.4lf\n", (tot[0] / ser_tot));
-        printf("Speedup ratio(without MPI_Scatter/MPI_Reduce) %.4lf\n", (tot[1] / ser_tot));
+        printf("Speedup ratio(with MPI_Scatter/MPI_Reduce)    %.4lf\n", ser_tot / tot[0]);
+        printf("Speedup ratio(without MPI_Scatter/MPI_Reduce) %.4lf\n", ser_tot / tot[1]);
         delete[] serial_res;
         delete[] parallel_res;
         delete[] matrix;
