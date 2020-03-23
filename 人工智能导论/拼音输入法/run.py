@@ -4,8 +4,8 @@ import numpy as np
 import json
 import scipy.io as scio
 from initmat import get_count
+from char2corpus import objectpath
 
-objectpath = "./sina_news_vocab"
 pinyin2char = {}
 vocab2id = {}
 weightmat = []
@@ -13,8 +13,12 @@ count_3gram = {}
 top2gram = {}
 
 
-def load_model():
-    global pinyin2char, vocab2id, weightmat, count_3gram, top2gram
+def load_model(style='modern'):
+    global pinyin2char, vocab2id, weightmat, count_3gram, top2gram, objectpath
+    if style == 'classical':
+        objectpath = "./vocab_poem"
+    else:
+        objectpath = "./sina_news_vocab"
     print("Loading Model...Please wait for about 10-15 seconds...")
     with open(objectpath+"/pinyin2char.json", "r", encoding="utf-8") as f:
         pinyin2char = json.load(f)
@@ -29,15 +33,14 @@ def load_model():
 
 
 # 2gram模型vitebi算法, 输入参数的拼音序列
-def vitebi_2gram(sentence, outputfile):
-    # print(sentence)
+def vitebi_2gram(sentence, outputfile, style='modern'):
     pinyin_list = sentence.strip().split(' ')
     dp = np.zeros((len(pinyin_list)+1, 120), dtype=float)
     mem = []
     resultlist = []
     # 检测是否合法
     for item in pinyin_list:
-        if not item.isalpha():
+        if not item.isalpha() or item not in pinyin2char:
             print("String: " + sentence + " is not valid!")
             with open(outputfile, 'a+', encoding="utf-8") as f:
                 f.write('\n')
@@ -116,6 +119,9 @@ def vitebi_2gram(sentence, outputfile):
     resultlist.append(pinyin2char[pinyin_list[0]][flagj])
     resultlist.reverse()
     result = "".join(resultlist)
+    if outputfile == "stdout":
+        print(result)
+        return
     with open(outputfile, 'a+', encoding="utf-8") as f:
         f.write(result + '\n')
     # print(result)
@@ -130,7 +136,7 @@ def vitebi_3gram(sentence, outputfile):
     previ = np.zeros((len(pinyin_list)+1, 120, 120), dtype=int)
     # 检测是否合法
     for item in pinyin_list:
-        if not item.isalpha():
+        if not item.isalpha() or item not in pinyin2char:
             print("String: " + sentence + " is not valid!")
             with open(outputfile, 'a+', encoding="utf-8") as f:
                 f.write('\n')
@@ -199,6 +205,9 @@ def vitebi_3gram(sentence, outputfile):
     resultlist.append(pinyin2char[pinyin_list[0]][flagj])
     resultlist.reverse()
     result = "".join(resultlist)
+    if outputfile == "stdout":
+        print(result)
+        return
     with open(outputfile, 'a+', encoding="utf-8") as f:
         f.write(result + '\n')
     # print(result)

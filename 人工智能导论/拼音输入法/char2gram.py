@@ -2,8 +2,7 @@
 import numpy as np
 import json, sys
 import scipy.io as scio
-
-objectpath = "./sina_news_vocab"
+from char2corpus import objectpath
 
 
 # 2元模型

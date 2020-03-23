@@ -2,8 +2,8 @@
 import scipy.io as scio
 import numpy as np
 import json
+from char2corpus import objectpath
 
-objectpath = "./sina_news_vocab"
 pyfile_candidate = "./拼音汉字表_12710172/拼音汉字表.txt"
 
 

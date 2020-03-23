@@ -1,8 +1,7 @@
 # -*- coding: UTF-8 -*-
 import sys, json
 from operator import itemgetter
-
-objectpath = "./sina_news_vocab"
+from char2corpus import objectpath
 
 
 # 3元模型, 对排名前1000000的二元组做三元组统计

@@ -37,12 +37,16 @@ def get_accuracy():
 
 def printhelp():
     print(" If you HAVE NOT preprocessed data, please run:")
-    print("      python -p")
+    print("      python pinyin.py -p")
     print("\n Attention:\n  This Preprocess will takes for about 30 mins and 5GB Runtime memory!!!")
     print("\n If you HAVE preprocessed data, please run:")
     print("      python pinyin.py inputfile outputfile [answerfile]")
     print("\n A simple demo is:")
     print("      python pinyin.py ./input.txt ./output.txt ./answer.txt")
+    print("\n If you want to run from stdin, please input")
+    print("      python pinyin.py -i")
+    print("\n If you want to run from stdin which translating [poems and classical chinese], please input")
+    print("      python pinyin.py -c")
 
 
 def printproinfo():
@@ -85,6 +89,18 @@ def run_translator(inputfile, outputfile):
     print("Finished!")
 
 
+def inputpinyin():
+    print("please input pinyin string:")
+    while True:
+        try:
+            pinyin = input()
+        except:
+            break
+        if pinyin == "e" or pinyin == "exit" or pinyin == "q" or pinyin == "^Z":
+            break
+        vitebi_2gram(pinyin, "stdout")
+
+
 if __name__ == '__main__':
     # python ./input.txt ./output.txt ./answer.txt
     print('')
@@ -98,6 +114,12 @@ if __name__ == '__main__':
         s = input()
         if s == 'y':
             preprocessdata()
+    elif sys.argv[1] == '-i':
+        load_model()
+        inputpinyin()
+    elif sys.argv[1] == '-c':
+        load_model('classical')
+        inputpinyin()
     elif len(sys.argv) == 4 or len(sys.argv) == 3:
         inputfile = sys.argv[1]
         outputfile = sys.argv[2]
