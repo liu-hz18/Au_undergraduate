@@ -14,39 +14,34 @@ constexpr char COMPETITOR = 1;
 constexpr char COMPUTER = 2;
 constexpr char BARRIER = 3;
 
-typedef unsigned long long u64;
-
 class AI;
 
 class Node {
 	friend class AI;
 	char player, winner;
 	int totaltime, wintime;
-	float ucb_a, ucb_b;
-	vector<int> top;
+	double ucb_a, ucb_b;
+	vector<char> top;//range: 0-12
 	vector<Node*> childlist;
 
 public:
-	Node() = default;
+	Node(): winner(-1), totaltime(0), wintime(0), ucb_a(0.0), ucb_b(0.0) {}
 	void init(char p, int n) {
 		player = p;
-		winner = -1;
-		totaltime = wintime = 0;
-		ucb_a = ucb_b = 0.0f;
 		top.resize(n);
 		childlist.resize(n, NULL);
 	}
 	void update() {
-		ucb_a = float(wintime) / float(totaltime);
-		ucb_b = 2 / sqrtf(totaltime);
+		ucb_a = double(wintime) / double(totaltime);
+		ucb_b = 2 / sqrt(totaltime);
 		if (player == COMPUTER) {
 			ucb_a = 1.0f - ucb_a;
 		}
 	}
-	Point* giveSelection(const float multier) {
+	Point* giveSelection(const double multier) {
 		Point* p = new Point(0, 0);
 		int i = 0;
-		float max = -1.0f;
+		double max = -1.0;
 		for (auto& child : childlist) {
 			if (child && max < child->ucb_a) {
 				max = child->ucb_a;
@@ -57,7 +52,7 @@ public:
 		}
 		return p;
 	}
-	float calculate(const float multier)const {
+	double calculate(const double multier)const {
 		return ucb_a + ucb_b * multier;
 	}
 	Node* findWinChild() {
@@ -82,8 +77,8 @@ public:
 		}
 		return -1;
 	}
-	int findRoad(const float& multier, Node*& next) {
-		float max = -1.0f;
+	int findRoad(const double& multier, Node*& next) {
+		double max = -1.0;
 		int road_rank = -1, i = 0;
 		for (auto& child: childlist) {
 			if (child && max < child->calculate(multier)) {

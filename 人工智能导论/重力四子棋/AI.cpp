@@ -6,13 +6,14 @@ constexpr int direcX[4] = { 1, 1, 1, 0 };
 constexpr int direcY[4] = { -1, 0, 1, 1 };
 
 constexpr int MAX_TIME = 500000;//最大模拟次数
-constexpr float constant = 0.71f;//常数因子
+constexpr size_t poolSize = 1000000;//内存池大小
+constexpr double constant = 0.71;//常数因子
 
-int M, N;
+static int M, N;//棋盘大小
 
 AI::AI(const int _m, const int _n, const int* top, int** _board,
 	const int lastX, const int lastY, const int noX, const int noY)
-	:m(_m), n(_n), nodeCount(0), ucb_multier(1.0) {
+	:m(_m), n(_n), nodeCount(0), ucb_multier(0.0) {
 	M = m, N = n;
 	board = new int[m * n];
 	init_board = new int[m * n];
@@ -27,18 +28,9 @@ AI::AI(const int _m, const int _n, const int* top, int** _board,
 		}
 	}
 	board[noX * n + noY] = init_board[noX * n + noY] = BARRIER;
-	int poolsize = MAX_TIME << 1;
-	nodePool = new Node[poolsize];
+	nodePool = new Node[poolSize];
 }
 
-AI::~AI() {
-	delete[] board;
-	delete[] init_board;
-	delete[] nodePool;
-	delete[] simulationTop;
-	delete[] setX;
-	delete[] setY;
-}
 
 Node* AI::addNode(char player) {
 	Node* anode = &nodePool[nodeCount++];
@@ -51,9 +43,6 @@ Node* AI::addNode(char player) {
 	return anode;
 }
 
-bool AI::isValid(const int x, const int y) const {
-	return (x >= 0 && x < m && y >= 0 && y < n);
-}
 
 bool AI::judgeWin(const int x, const int y) const{
 	int dx, dy, center = board[x * n + y], count, locx, locy;
@@ -71,10 +60,6 @@ bool AI::judgeWin(const int x, const int y) const{
 			return true;
 	}
 	return false;
-}
-
-char AI::nextPlayer(char curPlayer) {
-	return COMPUTER + COMPETITOR - curPlayer;
 }
 
 bool AI::checkCurPlayerWin(int* setX, int* setY, const int& choice, const char& player) {
@@ -132,7 +117,7 @@ Node* AI::selection(Node* root, vector<Node*>& path) {
 				board[x * n + y] = cur->player;
 				cur = next;
 			} else {
-				return cur;
+				return NULL;
 			}
 		}
 	}
@@ -193,17 +178,13 @@ void AI::backPropagation(vector<Node*>& path, int result) {
 	}
 }
 
-void AI::reset() {//还原
-	memcpy(board, init_board, m * n * sizeof(int));
-}
-
 Point* AI::MCST() {
 	Node* root = addNode(COMPUTER);
 	int t, result = 0;
 	srand((unsigned)time(NULL));
 	timer.start();
 	for (t = 0; t < MAX_TIME; t++) {
-		ucb_multier = (root->totaltime <= 1) ? 0.0f : constant * sqrtf(log(root->totaltime));
+		ucb_multier = (root->totaltime <= 1) ? 0.0 : constant * sqrt(log(root->totaltime));
 		vector<Node*> path;
 		Node* pos = selection(root, path);
 		if (pos) {//可以扩展
@@ -219,7 +200,7 @@ Point* AI::MCST() {
 			result = 0;
 		}
 		backPropagation(path, result);
-		if (timer.duration() > 1.5)
+		if (timer.duration() > 1.8)
 			break;
 		reset();
 	}

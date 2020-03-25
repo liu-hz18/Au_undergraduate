@@ -9,14 +9,13 @@ class Timer {
 	bool is_running;
 public:
 	Timer() :begin(0), is_running(false) {}
-	void start() {
+	inline void start() {
 		begin = clock();
 		is_running = true;
 	}
-	float duration()const {
-		if (is_running)
-			return (clock() - begin) / float(CLOCKS_PER_SEC);
-		return 0.0;
+	inline float duration()const {
+		return is_running ? (clock() - begin) / float(CLOCKS_PER_SEC) : 0.0f;
 	}
 };
+
 #endif
