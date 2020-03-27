@@ -1,6 +1,6 @@
-// PTå›¾æ±‚å…³é”®è·¯å¾„ä¸å…è®¸å»¶è¯¯æ—¶é—´
-//    2018011446   åˆ˜æ³“å°Š
-//æ³¨æ„å‡½æ•°è°ƒç”¨é¡ºåºä¸èƒ½éšæ„è°ƒæ¢
+// PTÍ¼Çó¹Ø¼üÂ·¾¶ÓëÔÊĞíÑÓÎóÊ±¼ä
+//    2018011446   Áõãü×ğ
+//×¢Òâº¯Êıµ÷ÓÃË³Ğò²»ÄÜËæÒâµ÷»»
 
 #include <cstdio>
 #include "Graph.h"
@@ -9,12 +9,12 @@ int main(){
 	int n;
 	std::cin >> n;
 	Graph G(n);
-	G.construct();//ä»stdinè¯»å…¥æ•°æ®ï¼Œå»ºå›¾
-	G.topoSortDFS(0);//ä»æºç‚¹DFSè¿›è¡Œæ‹“æ‰‘æ’åº
-	G.earlistStartTime();//æ±‚æœ€æ—©å¯åŠ¨æ—¶é—´
-	G.latestStartTime();//æ±‚æœ€æ™šå¯åŠ¨æ—¶é—´
-	printf("%d\n", G.totalTime());//è¾“å‡ºæ€»æ—¶é—´
-	G.printKeyPath();//DFSè¾“å‡ºå…³é”®è·¯å¾„
-	G.printTime();//è¾“å‡ºèŠ‚ç‚¹å…è®¸å»¶è¯¯æ—¶é—´
+	G.construct();//´Óstdin¶ÁÈëÊı¾İ£¬½¨Í¼
+	G.topoSortDFS(0);//´ÓÔ´µãDFS½øĞĞÍØÆËÅÅĞò
+	G.earlistStartTime();//Çó×îÔçÆô¶¯Ê±¼ä
+	G.latestStartTime();//Çó×îÍíÆô¶¯Ê±¼ä
+	printf("%d\n", G.totalTime());//Êä³ö×ÜÊ±¼ä
+	G.printKeyPath();//DFSÊä³ö¹Ø¼üÂ·¾¶
+	G.printTime();//Êä³ö½ÚµãÔÊĞíÑÓÎóÊ±¼ä
 	return 0;
 }
