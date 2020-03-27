@@ -11,10 +11,8 @@ entity decoder is
     );
 end decoder;
 
-architecture bhv of decoder is
-begin
-    process(bit_4_vec)
-    begin
+architecture bhv of decoder is begin
+    process(bit_4_vec) begin
         case bit_4_vec is --译码处理
             when "0000" => bit_7_vec <= "1111110";
             when "0001" => bit_7_vec <= "0110000";
