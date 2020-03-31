@@ -1,0 +1,276 @@
+
+\documentclass[UTF8, onecolumn, a4paper]{article}
+\usepackage{ctex}
+\setlength{\parindent}{2em}
+\usepackage{appendix}
+\usepackage{geometry}
+\usepackage{amsmath, amsthm}
+\usepackage{multirow, multicol}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{lettrine}
+\usepackage{authblk}
+\usepackage{indentfirst}
+\usepackage{xcolor, fontspec}%用于设置颜色
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{listings}%用于显示代码
+\usepackage[colorlinks,
+linkcolor=red,
+anchorcolor=blue,
+citecolor=green
+]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{trees}
+\geometry{left=2.5cm,right=2.5cm,top=2.0cm,bottom=2.0cm}
+
+
+\title{\textbf{计数器的设计: 实验报告}}%———总标题
+\author{刘泓尊\quad 2018011446\quad 计84}
+%\affil{Department of Computer Science, Tsinghua University}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\lstset{%代码块全局设置
+	backgroundcolor=\color{red!3!green!3!blue!3},%代码块背景色为浅灰色
+	rulesepcolor= \color{gray}, %代码块边框颜色
+	breaklines=true,  %代码过长则换行
+	numbers=left, %行号在左侧显示
+	numberstyle= \small,%行号字体
+	%keywordstyle= \color{red},%关键字颜色
+	commentstyle=\color{gray}, %注释颜色
+	frame=shadowbox,%用方框框住代码块
+	xleftmargin=1em,
+	xrightmargin=0em,
+	tabsize=5,
+	%rulesepcolor=\color{red!20!green!20!blue!20},  %阴影颜色
+	keywordstyle={\color{blue!90!}\fontspec{Consolas Bold}},   %关键字颜色
+	commentstyle={\color{blue!70!black}\fontspec{Consolas Italic}},   %注释颜色
+	stringstyle=\color{orange!100!black}, %字符串颜色
+	numberstyle=\color{purple}, %行号颜色
+	%basicstyle=\ttfamily, %代码风格
+	basicstyle=\fontspec{Consolas},
+	showstringspaces=false,          % underline spaces within strings only  
+	showtabs=false,
+	captionpos=t, %文件标题位置
+	flexiblecolumns
+}
+%\vspace*{20}
+\section{File Structure}
+\tikzstyle{every node}=[draw=black,thick,anchor=west]
+\tikzstyle{selected}=[draw=red,fill=red!30]
+\tikzstyle{optional}=[dashed,fill=gray!50]
+\begin{center}
+	\begin{tikzpicture}
+	[
+	grow via three points={one child at (0.5,-0.7) and
+		two children at (0.5,-0.7) and (0.5,-1.4)},
+	edge from parent path={(\tikzparentnode.south)  |-(\tikzchildnode.west)}]
+	\node {2018011446}
+	child { node {counter}
+		child {node {d\_ff.vhd}}
+		child {node {decoder.vhd}}
+		child {node {fourbitcounter.vhd}}
+		child {node {counter.vhd}}
+		child {node {Waveform.vwf}}
+	}
+	child [missing] {}				
+	child [missing] {}
+	child [missing] {}
+	child [missing] {}
+	child [missing] {}
+	child { node {2018011446\_刘泓尊\_计数器.pdf}};
+	\end{tikzpicture}
+\end{center}
+\clearpage
+\section{实验目的}
+\begin{enumerate}
+	\item[(1)] 掌握时序逻辑电路的基本分析和设计方法.
+	\item[(2)] 理解同步时序逻辑电路和异步时序逻辑电路的区别.
+	\item[(3)] 掌握计数器电路设计原理，用硬件描述语言实现指定功能的计数器设计.
+	\item[(4)] 学会利用软件仿真实现对数字电路的逻辑功能进行验证和分析.
+\end{enumerate}
+\section{实验任务}
+\begin{enumerate}
+	\item[(1)] 使用两个未经译码处理的数码管显示计数，手动单次时钟进行计数，到59的时候回到00。
+	\item[(2)] 使用实验平台上的1MHz时钟，将计数器改成秒表，并使用开关控制秒表的启动、暂停。
+\end{enumerate}
+	
+\section{集成“手动”与“秒表”版本}
+支持“手动clk/秒表clk/暂停/复位”功能。
+\paragraph*{}
+我将两个部分功能实现了集成，在暂停时，可以手动按下clk实现计数器的加一。再次按下pause后，可以开启秒表模式，在当前计数基础上进行每1s一次的计数。在实现过程中，我使用了大量“元件例化”的方法，并且没有使用"+"。本部分代码位于./counter下
+
+\subsection{D触发器的实现}
+践行模块化设计的思路，我实现了D触发器，实现如下:
+\begin{lstlisting}[language={VHDL}, title={d\_ff.vhd}]
+-- 异步复位D触发器 --
+entity d_ff is
+	port(
+		clk: in std_logic;
+		rst: in std_logic;
+		pause: in std_logic;
+		d: in std_logic;
+		q: out std_logic;
+		nq: out std_logic
+	);
+end d_ff;
+
+architecture bhv of d_ff is
+begin
+	process(clk, rst) begin
+		if rst = '1' then
+			q <= '0';
+			nq <= '1';
+		elsif clk'event and clk='1' then
+			if pause='0' then
+				q <= d;
+				nq <= not d;
+			else --维持不变
+				q <= not d;
+				nq <= d;
+			end if;
+		end if;
+	end process; 
+end bhv;
+\end{lstlisting}
+
+\subsection{计时器模块}
+为了实现“计时”与“计数”的解耦，我将计时器单独作为一个模块。该模块通过记录时钟上升沿个数，每个1M次时钟周期产生一次脉冲。在1MHz的时钟频率下，该模块将产生每1s一次的脉冲，代码如下:
+\begin{lstlisting}[language={VHDL}, title={.vhd}]
+-- 产生秒表序列(时钟频率1MHz: 产生1s的周期序列) --
+entity clkpersecond is
+	port(
+		clk: in std_logic;
+		rst: in std_logic;
+		clkps: out std_logic
+	);
+end clkpersecond;
+
+architecture bhv of clkpersecond is
+	signal outclk: std_logic := '0';
+	signal count: integer := 0;
+	constant FREQUENCY: integer := 1000000/2;--设置时钟频率1MHz
+begin
+	clkps <= outclk;
+	process(clk, rst) begin
+		if rst = '1' then
+			count <= 0;
+			outclk <= '0';
+		elsif clk'event and clk='1' then
+			if count < FREQUENCY then
+				count <= count + 1;
+			else
+				count <= 0;
+				outclk <= (not outclk);--跳变
+			end if;
+		end if;
+	end process;
+end bhv;
+\end{lstlisting}
+\subsection{4位加法计数器}
+在译码处理前，由于第一位表示0-9的数字，第二位表示0-5的数据，所以需要4位二进制来表示。为了进一步解耦，我实现了用四位二进制数表示计数个数的四位计数器。该模块根据d触发器实现时序逻辑的设计，“十分底层”地实现了计数器，而不是使用简单地+1。具体实现如下:
+\begin{lstlisting}[language={VHDL}, title={fourbitcounter.vhd}]
+-- 四位加法计数器 --
+entity fourbitcounter is
+	port(
+		clk: in std_logic;
+		rst: in std_logic;
+		pause: in std_logic;
+		qvec: out std_logic_vector(3 downto 0)
+	);
+end fourbitcounter;
+
+architecture bhv of fourbitcounter is
+	component d_ff
+		port(
+			clk: in std_logic;
+			rst: in std_logic;
+			pause: in std_logic;
+			d: in std_logic;
+			q: out std_logic;
+			nq: out std_logic
+		);
+end component;
+	signal q_buf: std_logic_vector(3 downto 0);
+	signal nq_buf: std_logic_vector(3 downto 0);
+begin
+	u0: d_ff port map(clk=>clk, rst=>rst, pause=>pause, d=>nq_buf(0), q=>q_buf(0), nq=>nq_buf(0) );
+	u1: d_ff port map(clk=>nq_buf(0), rst=>rst, pause=>pause, d=>nq_buf(1), q=>q_buf(1), nq=>nq_buf(1) );
+	u2: d_ff port map(clk=>nq_buf(1), rst=>rst, pause=>pause, d=>nq_buf(2), q=>q_buf(2), nq=>nq_buf(2) );
+	u3: d_ff port map(clk=>nq_buf(2), rst=>rst, pause=>pause, d=>nq_buf(3), q=>q_buf(3), nq=>nq_buf(3) );
+	qvec <= q_buf;
+end bhv;
+\end{lstlisting}
+\subsection{计数器}
+有了上面实现的四位计数器和计时器模块，可以很方便地实现计数器了。该模块是顶层实体，通过计时器识别时钟信号并给出1s一次的脉冲，之后四位计数器实现一次自增，最终将输出结果经过译码器进行显示。代码如下:
+\begin{lstlisting}[language={VHDL}, title={counter.vhd}]
+-- 计数器(用数码管显示，支持手动clk/秒表clk/暂停/复位 功能, 60进制) --
+entity counter is
+	port(
+		clk: in std_logic;
+		rst: in std_logic;
+		pause: in std_logic;
+		mode: in std_logic;--mode = '1'的时候是秒表，否则是手动加
+		highcode: out std_logic_vector(6 downto 0);
+		lowcode: out std_logic_vector(6 downto 0)
+	);
+end counter;
+
+architecture bhv of counter is
+	component decoder
+		port(
+			bit_4_vec: in std_logic_vector(3 downto 0);
+			bit_7_vec: out std_logic_vector(6 downto 0)
+		);
+	end component;
+	component fourbitcounter
+		port(
+			clk: in std_logic;
+			rst: in std_logic;
+			pause: in std_logic;
+			qvec: out std_logic_vector(3 downto 0)
+		);
+	end component;
+	component clkpersecond
+		port(
+			clk: in std_logic;
+			rst: in std_logic;
+			clkps: out std_logic
+		);
+	end component;
+	signal clockUsing: std_logic;
+	signal clockPerSecond: std_logic;
+	signal resetLow: std_logic := '0';
+	signal resetHigh: std_logic := '0';
+	signal outputLow: std_logic_vector(3 downto 0);
+	signal outputHigh: std_logic_vector(3 downto 0);
+begin
+	clockUsing <= clockPerSecond when mode = '1' else clk;
+	resetLow <= '1' when outputLow = "1010" else '0';--到10进1   
+	resetHigh <= '1' when outputLow = "0000" and outputHigh = "0110" else '0';--到60归零
+	getclk: clkpersecond port map(clk=>clk, rst=>rst, clkps=>clockPerSecond);
+	u1: fourbitcounter port map(clk=>clockUsing, rst=>(rst or resetLow), pause=>pause, qvec=>outputLow );
+	u2: fourbitcounter port map(clk=>resetLow, rst=>(rst or resetHigh), pause=>pause, qvec=>outputHigh );
+	decoder1: decoder port map(bit_4_vec=>outputLow, bit_7_vec=>lowcode);
+	decoder2: decoder port map(bit_4_vec=>outputHigh, bit_7_vec=>highcode);
+end bhv;aa
+\end{lstlisting}
+
+\section{仿真结果}
+使用Quartus的ModelSim进行仿真(根目录附"\textbf{Waveform.vwf}"文件)，结果如下
+\begin{figure}[htb]
+	\centering
+	%\includegraphics[width=1.0\textwidth]{}
+\end{figure}
+\section{JieLab运行结果(附录屏)}
+我将代码放在了JieLab实验平台上进行了验证，下面是运行时的截图，在根目录下有"\textbf{JieLabs录屏.mp4}"，您可以更直观地检查我的实现效果
+\begin{figure}[htb]
+	\centering
+	%\includegraphics[width=0.8\textwidth]{}
+\end{figure}
+\section{实验总结}
+\paragraph*{}
+本次实验我采用了大量的“元件例化”方法，在极大程度上实现了“解耦”与模块化设计，我的VHDL编程能力得到了极大提升。我自己实现了d触发器，使用时序逻辑的方式实现了计数器，而不是简单地使用"+1"语句，因此，我切身体会到了时序逻辑的设计方法和电路特点，没有依赖软件的编译与自动转换，对时序逻辑的增进了理解。同时，我也被硬件所能实现的众多有趣功能所吸引，希望在将来能设计出更多有意义的电路。感谢老师助教在微信群中的耐心指导!
+\end{document}
