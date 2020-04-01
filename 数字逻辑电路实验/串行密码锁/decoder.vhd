@@ -9,10 +9,9 @@ entity decoder is
     );
 end decoder;
 
-architecture bhv of decoder is
+architecture bhv_decode of decoder is
 begin
-    process(bit_4_vec)
-    begin
+    process(bit_4_vec) begin
         case bit_4_vec is --译码处理
             when "0000" => bit_7_vec <= "1111110";
             when "0001" => bit_7_vec <= "0110000";
@@ -33,4 +32,4 @@ begin
             when others => bit_7_vec <= "0000000"; --其他情况全灭
         end case;
     end process;
-end bhv;
+end bhv_decode;
