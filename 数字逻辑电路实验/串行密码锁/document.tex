@@ -1,0 +1,319 @@
+
+\documentclass[UTF8, onecolumn, a4paper]{article}
+\usepackage{ctex}
+\setlength{\parindent}{2em}
+\usepackage{appendix}
+\usepackage{geometry}
+\usepackage{amsmath, amsthm}
+\usepackage{multirow, multicol}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{lettrine}
+\usepackage{authblk}
+\usepackage{indentfirst}
+\usepackage{xcolor, fontspec}%用于设置颜色
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{listings}%用于显示代码
+\usepackage[colorlinks,
+linkcolor=red,
+anchorcolor=blue,
+citecolor=green
+]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{trees}
+\geometry{left=2.5cm,right=2.5cm,top=2.0cm,bottom=2.0cm}
+
+
+\title{\textbf{串行密码锁: 实验报告}}%———总标题
+\author{刘泓尊\quad 2018011446\quad 计84}
+%\affil{Department of Computer Science, Tsinghua University}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\lstset{%代码块全局设置
+	backgroundcolor=\color{red!3!green!3!blue!3},%代码块背景色为浅灰色
+	rulesepcolor= \color{gray}, %代码块边框颜色
+	breaklines=true,  %代码过长则换行
+	numbers=left, %行号在左侧显示
+	numberstyle= \small,%行号字体
+	%keywordstyle= \color{red},%关键字颜色
+	commentstyle=\color{gray}, %注释颜色
+	frame=shadowbox,%用方框框住代码块
+	xleftmargin=0em,
+	xrightmargin=0em,
+	tabsize=5,
+	%rulesepcolor=\color{red!20!green!20!blue!20},  %阴影颜色
+	keywordstyle={\color{blue!90!}\fontspec{Consolas Bold}},   %关键字颜色
+	commentstyle={\color{blue!70!black}\fontspec{Consolas Italic}},   %注释颜色
+	stringstyle=\color{orange!100!black}, %字符串颜色
+	numberstyle=\color{purple}, %行号颜色
+	%basicstyle=\ttfamily, %代码风格
+	basicstyle=\fontspec{Consolas},
+	showstringspaces=false,          % underline spaces within strings only  
+	showtabs=false,
+	captionpos=t, %文件标题位置
+	flexiblecolumns
+}
+%\vspace*{20}
+\section{File Structure}
+\tikzstyle{every node}=[draw=black,thick,anchor=west]
+\tikzstyle{selected}=[draw=red,fill=red!30]
+\tikzstyle{optional}=[dashed,fill=gray!50]
+\begin{center}
+	\begin{tikzpicture}
+	[
+	grow via three points={one child at (0.5,-0.7) and
+		two children at (0.5,-0.7) and (0.5,-1.4)},
+	edge from parent path={(\tikzparentnode.south)  |-(\tikzchildnode.west)}]
+	\node {2018011446}
+	child { node {counter}
+		child {node {decoder.vhd}}
+		child {node {setpwd.vhd}}
+		child {node {checkpwd.vhd}}
+		child {node {lock.vhd}}
+		child {node {Waveform.vwf}}	
+	}
+	child [missing] {}
+	child [missing] {}
+	child [missing] {}
+	child [missing] {}					
+	child [missing] {}
+	child {node {lock.mp4}}
+	child {node {lock.json}}
+	child {node {串行密码锁仿真样例.png}}
+	child { node {2018011446\_刘泓尊\_串行密码锁.pdf}};
+	\end{tikzpicture}
+\end{center}
+\clearpage
+\section{实验目的}
+\begin{enumerate}
+	\item[(1)] 学习使用状态机来控制电路工作，在不同的状态下完成相应的功能。
+	\item[(2)] 进一步掌握时序逻辑电路的基本分析和设计方法。
+	\item[(3)] 学会利用软件仿真实现对数字电路的逻辑功能进行验证和分析.
+\end{enumerate}
+\section{实验任务}
+\begin{enumerate}
+	\item[(1)] 设计一个4位16进制串行电子密码锁，功能包括:设置密码，验证密码。
+	\item[(2)] 实现密码预置(管理员密码)和系统报警功能。
+\end{enumerate}
+	
+\section{代码及注释}
+在mode=“00”时是设置密码状态，mode=“01”时是验证密码状态。mode=“1x”时仍是验证密码，但是验证管理员密码。管理员密码我在程序中设置为“0000”。每次更换操作后均应按下“rst”，每输入一位之后均应按下“clk”.
+\paragraph*{}
+我使用状态机实现了串行密码锁的“设置密码”与“验证密码”。其流程与实验说明中的流程一致。我将程序模块分为“输入密码(setpwd)”与“验证密码(checkpwd)”两个模块，每个模块内的核心逻辑就是状态机。同时，为了便于直观显示，我将输入的每个数字通过“显示译码器”输出到7段数码管。
+\subsection{设置密码}
+设置密码的状态机与课本给出的一致。
+
+\begin{lstlisting}[language={VHDL}, title={setpwd.vhd}]
+entity setpwd is
+	port(
+		clk, rst: in std_logic;
+		mode: in std_logic_vector(1 downto 0);
+		code: in std_logic_vector(3 downto 0);
+		pwd0, pwd1, pwd2, pwd3: out std_logic_vector(3 downto 0);
+		currentnum: out std_logic_vector(3 downto 0)
+	);
+end setpwd;
+
+architecture bhv_set of setpwd is
+	signal state: integer := 0;
+begin
+	currentnum <= code;
+	process(clk, rst) begin
+		if rst = '1' then --异步复位
+			state <= 1;
+		elsif clk'event and clk = '1' then
+			if mode = "00" then
+				case state is--设置密码状态机
+				when 1 =>
+					pwd0 <= code; state <= 2;
+				when 2 =>
+					pwd1 <= code; state <= 3;
+				when 3 =>
+					pwd2 <= code; state <= 4;
+				when 4 =>
+					pwd3 <= code; state <= 0;
+				when others => null;
+				end case;
+			end if;
+		end if;
+	end process;
+end bhv_set;
+\end{lstlisting}
+\subsection{验证密码}
+验证密码的流程与课本给出的一致，只是加了mode="01"还是mode="1x"的判断。
+\begin{lstlisting}[language={VHDL}, title={checkpwd.vhd}]
+entity checkpwd is
+	port(
+		clk, rst: in std_logic;
+			mode: in std_logic_vector(1 downto 0);
+			code: in std_logic_vector(3 downto 0);
+			unlock, err, alarm: buffer std_logic;
+			pwd0, pwd1, pwd2, pwd3: in std_logic_vector(3 downto 0);--4位16进制密码，由setpwd提供
+			currentnum: out std_logic_vector(3 downto 0) -- 数码管输出当前数位
+	);
+	type fourbitpwd is array(3 downto 0) of integer; 
+end checkpwd;
+
+architecture bhv_check of checkpwd is
+	signal state: integer := 0; --状态机当前状态
+	signal cnt: integer := 0;--输入错误的次数
+	constant adminpwd: fourbitpwd := (0, 0, 0, 0);--admin密码设为0000
+begin
+	currentnum <= code;
+	process(clk, rst) begin
+		if rst = '1' then --reset时alarm不清零
+			state <= 1;--状态机:i状态开始接受第i位密码
+			unlock <= '0'; err <= '0';
+			if alarm = '1' then
+				cnt <= 0;
+			end if;
+		elsif clk'event and clk='1' then
+			if mode = "01" then --user验证密码模式
+				case state is--状态机
+				when 1 =>
+					if code = pwd0 then
+						state <= 2;
+					else
+						err <= '1'; cnt <= cnt + 1; state <= 0;--输入错误
+					end if;
+				when 2 =>
+					if code = pwd1 then
+						state <= 3;
+					else
+						err <= '1'; cnt <= cnt + 1; state <= 0;
+					end if;
+				when 3 =>
+					if code = pwd2 then
+						state <= 4;
+					else 
+						err <= '1'; cnt <= cnt + 1; state <= 0;
+					end if;
+				when 4 =>
+					if code = pwd3 then --正确
+						cnt <= 0; err <= '0'; unlock <= '1'; state <= 0;
+					else
+						err <= '1'; cnt <= cnt + 1; state <= 0;
+					end if;
+				when others => null;
+				end case;
+				if cnt > 1 then
+					alarm <= '1';
+				end if;
+			elsif (mode = "10" or mode = "11") then --admin模式
+				case state is
+				when 1 =>
+					if CONV_INTEGER(code) = adminpwd(3) then
+						state <= 2;
+					else
+						err <= '1'; state <= 0;--输入错误
+					end if;
+				when 2 =>
+					if CONV_INTEGER(code) = adminpwd(2) then
+						state <= 3;
+					else
+						err <= '1'; state <= 0;
+					end if;
+				when 3 =>
+					if CONV_INTEGER(code) = adminpwd(1) then
+						state <= 4;
+					else
+						err <= '1'; state <= 0;
+					end if;
+				when 4 =>
+					if CONV_INTEGER(code) = adminpwd(0) then
+						cnt <= 0; err <= '0'; unlock <= '1'; 
+						alarm <= '0';--警报关闭
+						state <= 0; --正确
+					else
+						err <= '1'; state <= 0;
+					end if;
+				when others => null;
+				end case;
+				if cnt > 1 then
+					alarm <= '1';
+				end if;
+			end if;
+		end if;
+	end process;
+end bhv_check;
+\end{lstlisting}
+\subsection{串行密码锁}
+串行密码锁的实现即例化了上述的“设置密码”与“验证密码”模块，同时对输入数字做了译码处理，用于七段数码管输出。
+\begin{lstlisting}[language={VHDL}, title={lock.vhd}]
+-- 串行密码锁:支持设置密码、验证密码、三次输入限制、管理员模式 --
+entity lock is
+	port(
+		code: in std_logic_vector(3 downto 0); --only for one digit
+		mode: in std_logic_vector(1 downto 0); --mode: 1x:Admin, 00:set password, 01:check password
+		clk, rst: in std_logic;
+		unlock_out, err_out, alarm_out: out std_logic; 
+		curnum: out std_logic_vector(6 downto 0)--Show the input number, for debug;
+	);
+end lock;
+
+architecture bhv of lock is
+	component checkpwd
+		port(
+			clk, rst: in std_logic;
+			mode: in std_logic_vector(1 downto 0);
+			code: in std_logic_vector(3 downto 0);
+			unlock, err, alarm: buffer std_logic;
+			pwd0, pwd1, pwd2, pwd3: in std_logic_vector(3 downto 0);--4位16进制密码，由setpwd提供
+			currentnum: out std_logic_vector(3 downto 0) -- 数码管输出当前数位
+		);
+	end component;
+	component setpwd
+		port(
+			clk, rst: in std_logic;
+			mode: in std_logic_vector(1 downto 0);
+			code: in std_logic_vector(3 downto 0);
+			pwd0, pwd1, pwd2, pwd3: out std_logic_vector(3 downto 0);
+			currentnum: out std_logic_vector(3 downto 0)
+		);
+	end component;
+	component decoder
+		port(
+			bit_4_vec: in std_logic_vector(3 downto 0);
+			bit_7_vec: out std_logic_vector(6 downto 0)
+		);
+	end component;
+	signal pwd0, pwd1, pwd2, pwd3: std_logic_vector(3 downto 0);
+	signal setnum: std_logic_vector(3 downto 0);
+	signal checknum: std_logic_vector(3 downto 0);
+	signal tempnum: std_logic_vector(3 downto 0);
+	signal alarm, err, unlock: std_logic;
+begin
+	cpwd: checkpwd port map(clk=>clk, rst=>rst, mode=>mode, code=>code, unlock=>unlock, err=>err, alarm=>alarm, pwd0=>pwd0, pwd1=>pwd1, pwd2=>pwd2, pwd3=>pwd3, currentnum=>checknum);--验证密码元件例化
+	spwd: setpwd port map(clk=>clk, rst=>rst, mode=>mode, code=>code, pwd0=>pwd0, pwd1=>pwd1, pwd2=>pwd2, pwd3=>pwd3, currentnum=>setnum);--设置密码元件例化
+	tempnum <= setnum when mode = "00" else checknum;--显示的数字
+	alarm_out <= alarm;  err_out <= err;  unlock_out <= unlock;
+	de: decoder port map(bit_4_vec=>tempnum, bit_7_vec=>curnum);--显示译码
+end bhv;
+\end{lstlisting}
+
+\section{仿真结果}
+使用Quartus的ModelSim进行仿真(附"\textbf{./lock/Waveform.vwf}"文件).下图详细说明了电路功能，包括“设置密码”，“验证密码”，“正确亮起unlock”，“错误亮起err”，“输入三次错误密码后亮起alarm”，“管理员模式下输入0000解除alarm”，“重置密码”等功能。
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=1.1\textwidth]{串行密码锁说明.png}
+\end{figure}
+
+%\clearpage
+\section{JieLabs运行结果(附录屏)}
+\paragraph*{}
+我在JieLabs上进行了硬件验证，并将实验结果录屏保存在./\textbf{lock.mp4}下，也随附平台导出的\textbf{lock.json}文件。
+\paragraph*{}
+该视频流程为: “设置密码为137F”$\rightarrow$“输入正确密码137F，unlock亮起”$\rightarrow$“输入错误密码，err亮起”$\rightarrow$“输入3次错误密码，alarm亮起”$\rightarrow$“输入管理员密码0000解锁，消除alarm”。下面是实验过程截图.
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.6\textwidth]{jielabs.png}
+\end{figure}
+\paragraph*{}
+说明: 左下角从左至右3个LED分别为“unlock, err, alarm”.左下角4个开关代表输入的1位16进制数，该数字也经过译码显示在7段数码管上。下层中部模块最左边两个开关为mode的控制，左侧高位右侧低位，为了直观，我将其显示在右上角最左侧数码管处。右下角模块左侧为rst，右侧为clk。
+\section{实验总结}
+\paragraph*{}
+本次实验是我第一次遇到较为实用性的功能电路，我学习了状态机在时序逻辑电路中的应用，学到了buffer, case, integer等语句的使用，以及CONV\_INTEGER函数(用于将std\_logic\_vector转换为integer)。综合练习了所学知识，设计代码更加得心应手，收获良多。最后，感谢老师和助教在微信群的耐心答疑与帮助！
+\end{document}

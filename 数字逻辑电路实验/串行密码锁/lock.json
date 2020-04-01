@@ -1,0 +1,165 @@
+{
+  "redux": {
+    "top": "lock",
+    "signals": {
+      "alarm_out": 11,
+      "curnum[2]": 10,
+      "curnum[1]": 15,
+      "curnum[0]": 12,
+      "clk": 3,
+      "mode[1]": 18,
+      "mode[0]": 7,
+      "rst": 0,
+      "unlock_out": 17,
+      "err_out": 6,
+      "code[3]": 14,
+      "code[2]": 19,
+      "code[1]": 8,
+      "code[0]": 13,
+      "curnum[6]": 4,
+      "curnum[5]": 9,
+      "curnum[4]": 16,
+      "curnum[3]": 5
+    },
+    "code": "\r\n-- Show the number input in LED --\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\n\r\nentity decoder is\r\n    port(\r\n        bit_4_vec: in std_logic_vector(3 downto 0);\r\n        bit_7_vec: out std_logic_vector(6 downto 0)\r\n    );\r\nend decoder;\r\n\r\narchitecture bhv_decode of decoder is\r\nbegin\r\n    process(bit_4_vec) begin\r\n        case bit_4_vec is --译码处理\r\n            when \"0000\" => bit_7_vec <= \"1111110\";\r\n            when \"0001\" => bit_7_vec <= \"0110000\";\r\n            when \"0010\" => bit_7_vec <= \"1101101\";\r\n            when \"0011\" => bit_7_vec <= \"1111001\";\r\n            when \"0100\" => bit_7_vec <= \"0110011\";\r\n            when \"0101\" => bit_7_vec <= \"1011011\";\r\n            when \"0110\" => bit_7_vec <= \"1011111\";\r\n            when \"0111\" => bit_7_vec <= \"1110000\";\r\n            when \"1000\" => bit_7_vec <= \"1111111\";\r\n            when \"1001\" => bit_7_vec <= \"1110011\";\r\n            when \"1010\" => bit_7_vec <= \"1110111\";\r\n            when \"1011\" => bit_7_vec <= \"0011111\";\r\n            when \"1100\" => bit_7_vec <= \"1001110\";\r\n            when \"1101\" => bit_7_vec <= \"0111101\";\r\n            when \"1110\" => bit_7_vec <= \"1001111\";\r\n            when \"1111\" => bit_7_vec <= \"1000111\";\r\n            when others => bit_7_vec <= \"0000000\"; --其他情况全灭\r\n        end case;\r\n    end process;\r\nend bhv_decode;\r\n\r\n\r\n-- 验证密码:使用状态机 --\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\nuse ieee.std_logic_arith.all;\r\nuse ieee.std_logic_unsigned.all;\r\n\r\nentity checkpwd is\r\n    port(\r\n        clk, rst: in std_logic;\r\n        mode: in std_logic_vector(1 downto 0);\r\n        code: in std_logic_vector(3 downto 0);\r\n        unlock, err, alarm: buffer std_logic;\r\n        pwd0, pwd1, pwd2, pwd3: in std_logic_vector(3 downto 0);--4位16进制密码，由setpwd提供\r\n        currentnum: out std_logic_vector(3 downto 0) -- 数码管输出当前数位\r\n    );\r\n    type fourbitpwd is array(3 downto 0) of integer; \r\nend checkpwd;\r\n\r\narchitecture bhv_check of checkpwd is\r\n    signal state: integer := 0; --状态机当前状态\r\n    signal cnt: integer := 0;--输入错误的次数\r\n    constant adminpwd: fourbitpwd := (0, 0, 0, 0);--admin密码设为0000\r\nbegin\r\n    currentnum <= code;\r\n    process(clk, rst) begin\r\n        if rst = '1' then --reset时alarm不清零\r\n            state <= 1;--状态机:i状态开始接受第i位密码\r\n            unlock <= '0';\r\n            err <= '0';\r\n            if alarm = '1' then\r\n                cnt <= 0;\r\n            end if;\r\n        elsif clk'event and clk='1' then\r\n            if mode = \"01\" then --user-输入密码模式\r\n                case state is\r\n                when 1 =>\r\n                    if code = pwd0 then\r\n                        state <= 2;\r\n                    else\r\n                        err <= '1';--输入错误\r\n                        cnt <= cnt + 1;\r\n                        state <= 0;\r\n                    end if;\r\n                when 2 =>\r\n                    if code = pwd1 then\r\n                        state <= 3;\r\n                    else\r\n                        err <= '1';\r\n                        cnt <= cnt + 1;\r\n                        state <= 0;\r\n                    end if;\r\n                when 3 =>\r\n                    if code = pwd2 then\r\n                        state <= 4;\r\n                    else \r\n                        err <= '1';\r\n                        cnt <= cnt + 1;\r\n                        state <= 0;\r\n                    end if;\r\n                when 4 =>\r\n                    if code = pwd3 then\r\n                        cnt <= 0;\r\n                        err <= '0';--正确\r\n                        unlock <= '1';\r\n                        state <= 0;\r\n                    else\r\n                        err <= '1';\r\n                        cnt <= cnt + 1;\r\n                        state <= 0;\r\n                    end if;\r\n                when others => null;\r\n                end case;\r\n                if cnt > 1 then\r\n                    alarm <= '1';\r\n                end if;\r\n            elsif (mode = \"10\" or mode = \"11\") then --admin模式\r\n                case state is\r\n                when 1 =>\r\n                    if CONV_INTEGER(code) = adminpwd(3) then\r\n                        state <= 2;\r\n                    else\r\n                        err <= '1';--输入错误\r\n                        state <= 0;\r\n                    end if;\r\n                when 2 =>\r\n                    if CONV_INTEGER(code) = adminpwd(2) then\r\n                        state <= 3;\r\n                    else\r\n                        err <= '1';\r\n                        state <= 0;\r\n                    end if;\r\n                when 3 =>\r\n                    if CONV_INTEGER(code) = adminpwd(1) then\r\n                        state <= 4;\r\n                    else\r\n                        err <= '1';\r\n                        state <= 0;\r\n                    end if;\r\n                when 4 =>\r\n                    if CONV_INTEGER(code) = adminpwd(0) then\r\n                        cnt <= 0;\r\n                        err <= '0';\r\n                        unlock <= '1';\r\n                        alarm <= '0';--警报关闭\r\n                        state <= 0; --正确\r\n                    else\r\n                        err <= '1';\r\n                        state <= 0;\r\n                    end if;\r\n                when others => null;\r\n                end case;\r\n                if cnt > 1 then\r\n                    alarm <= '1';\r\n                end if;\r\n            end if;\r\n        end if;\r\n    end process;\r\n    \r\nend bhv_check;\r\n\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\nuse ieee.std_logic_arith.all;\r\nuse ieee.std_logic_unsigned.all;\r\n\r\nentity setpwd is\r\n    port(\r\n        clk, rst: in std_logic;\r\n        mode: in std_logic_vector(1 downto 0);\r\n        code: in std_logic_vector(3 downto 0);\r\n        pwd0, pwd1, pwd2, pwd3: out std_logic_vector(3 downto 0);\r\n        currentnum: out std_logic_vector(3 downto 0)\r\n    );\r\nend setpwd;\r\n\r\narchitecture bhv_set of setpwd is\r\n    signal state: integer := 0;\r\nbegin\r\n    currentnum <= code;\r\n    process(clk, rst) begin\r\n        if rst = '1' then --异步复位(同步复位直接放在下面的if下就可以)\r\n            state <= 1;\r\n        elsif clk'event and clk = '1' then\r\n            if mode = \"00\" then\r\n                case state is\r\n                when 1 =>\r\n                    pwd0 <= code;\r\n                    state <= 2;\r\n                when 2 =>\r\n                    pwd1 <= code;\r\n                    state <= 3;\r\n                when 3 =>\r\n                    pwd2 <= code;\r\n                    state <= 4;\r\n                when 4 =>\r\n                    pwd3 <= code;\r\n                    state <= 0;\r\n                when others => null;\r\n                end case;\r\n            end if;\r\n        end if;\r\n    end process;\r\nend bhv_set;\r\n\r\n-- 串行密码锁:支持设置密码、验证密码、三次输入限制、管理员模式 --\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\nuse ieee.std_logic_arith.all;\r\nuse ieee.std_logic_unsigned.all;\r\n\r\nentity lock is\r\n    port(\r\n        code: in std_logic_vector(3 downto 0); --only for one digit\r\n        mode: in std_logic_vector(1 downto 0); --mode: 1x:Admin, 00:set password, 01:check password\r\n        clk, rst: in std_logic;\r\n        --unlock, err, alarm: buffer std_logic;\r\n        unlock_out, err_out, alarm_out: out std_logic; \r\n        curnum: out std_logic_vector(6 downto 0)--Show the input number, for debug;\r\n    );\r\nend lock;\r\n\r\narchitecture bhv of lock is\r\n    component checkpwd\r\n        port(\r\n            clk, rst: in std_logic;\r\n            mode: in std_logic_vector(1 downto 0);\r\n            code: in std_logic_vector(3 downto 0);\r\n            unlock, err, alarm: buffer std_logic;\r\n            pwd0, pwd1, pwd2, pwd3: in std_logic_vector(3 downto 0);--4位16进制密码，由setpwd提供\r\n            currentnum: out std_logic_vector(3 downto 0) -- 数码管输出当前数位\r\n        );\r\n    end component;\r\n    component setpwd\r\n        port(\r\n            clk, rst: in std_logic;\r\n            mode: in std_logic_vector(1 downto 0);\r\n            code: in std_logic_vector(3 downto 0);\r\n            pwd0, pwd1, pwd2, pwd3: out std_logic_vector(3 downto 0);\r\n            currentnum: out std_logic_vector(3 downto 0)\r\n        );\r\n    end component;\r\n    component decoder\r\n        port(\r\n            bit_4_vec: in std_logic_vector(3 downto 0);\r\n            bit_7_vec: out std_logic_vector(6 downto 0)\r\n        );\r\n    end component;\r\n    signal pwd0, pwd1, pwd2, pwd3: std_logic_vector(3 downto 0);\r\n    signal setnum: std_logic_vector(3 downto 0);\r\n    signal checknum: std_logic_vector(3 downto 0);\r\n    signal tempnum: std_logic_vector(3 downto 0);\r\n    signal alarm, err, unlock: std_logic;\r\nbegin\r\n    cpwd: checkpwd port map(clk=>clk, rst=>rst, mode=>mode, code=>code, unlock=>unlock, err=>err, alarm=>alarm,\r\n            pwd0=>pwd0, pwd1=>pwd1, pwd2=>pwd2, pwd3=>pwd3, currentnum=>checknum);\r\n    spwd: setpwd port map(clk=>clk, rst=>rst, mode=>mode, code=>code, \r\n            pwd0=>pwd0, pwd1=>pwd1, pwd2=>pwd2, pwd3=>pwd3, currentnum=>setnum);\r\n    tempnum <= setnum when mode = \"00\" else checknum;\r\n    alarm_out <= alarm;\r\n    err_out <= err;\r\n    unlock_out <= unlock;\r\n    de: decoder port map(bit_4_vec=>tempnum, bit_7_vec=>curnum);\r\nend bhv;\r\n",
+    "field": [
+      {
+        "type": "FPGA",
+        "x": 0,
+        "y": 0,
+        "id": "fpga",
+        "persistent": true
+      },
+      {
+        "type": "Clock",
+        "x": 350,
+        "y": 175,
+        "id": "clock_1"
+      },
+      {
+        "type": "Switch4",
+        "id": "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd",
+        "x": 0,
+        "y": 175
+      },
+      {
+        "type": "Switch4",
+        "id": "7375df24-0965-4e66-b05a-e7c8f2795d55",
+        "x": 175,
+        "y": 175
+      },
+      {
+        "type": "Digit7",
+        "id": "3ff5ee1b-9155-4249-ad6d-2f9f6c31ef8f",
+        "x": 175,
+        "y": 0
+      },
+      {
+        "type": "Digit4",
+        "id": "c3b188f2-1268-4950-9b69-57f20e3d3ab5",
+        "x": 350,
+        "y": 0
+      }
+    ]
+  },
+  "sandbox": {
+    "groups": {
+      "c3d32a73-d4d7-4a42-a73b-09691f1cd05f": [
+        "fpga-17",
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-led-0"
+      ],
+      "e152c972-b9a1-4623-8f33-aa68ff6fa1cb": [
+        "fpga-6",
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-led-1"
+      ],
+      "1123b6d1-0a46-4caa-b30b-1ff49503b296": [
+        "fpga-11",
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-led-2"
+      ],
+      "feec963f-bd1e-4dfd-83b8-a3e2a09aa53b": [
+        "fpga-14",
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-0"
+      ],
+      "f2a1bb89-4c65-4d31-9fd2-f1bcffa26459": [
+        "fpga-19",
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-1"
+      ],
+      "75fd7adb-7f7b-4690-86f1-99a7c87a2b04": [
+        "fpga-8",
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-2"
+      ],
+      "8dac614c-1d19-4895-bee3-976e74097909": [
+        "fpga-13",
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-3"
+      ],
+      "0d155a1b-ed8a-49e5-aafc-407923eaa98b": [
+        "7375df24-0965-4e66-b05a-e7c8f2795d55-switch-0",
+        "fpga-18",
+        "c3b188f2-1268-4950-9b69-57f20e3d3ab5-A-2"
+      ],
+      "9105ef55-0049-471a-b9da-af87803d5eea": [
+        "7375df24-0965-4e66-b05a-e7c8f2795d55-switch-1",
+        "fpga-7",
+        "c3b188f2-1268-4950-9b69-57f20e3d3ab5-A-1"
+      ],
+      "5fb67390-abc9-47c3-898a-714b626d721e": [
+        "clock_1-rst",
+        "fpga-3"
+      ],
+      "26769352-feb5-4b22-89da-5d6eff534a3a": [
+        "fpga-12",
+        "3ff5ee1b-9155-4249-ad6d-2f9f6c31ef8f-A-G"
+      ],
+      "8c7ea4b2-7987-4ae3-917f-fc8c7d1f6419": [
+        "fpga-15",
+        "3ff5ee1b-9155-4249-ad6d-2f9f6c31ef8f-A-F"
+      ],
+      "2fcb49c1-1992-4adc-bff0-84331a90e53d": [
+        "fpga-10",
+        "3ff5ee1b-9155-4249-ad6d-2f9f6c31ef8f-A-E"
+      ],
+      "c0faac07-1a87-4ccb-9a74-8b95bc827f91": [
+        "fpga-5",
+        "3ff5ee1b-9155-4249-ad6d-2f9f6c31ef8f-A-D"
+      ],
+      "dea3aa2d-a90d-466a-ac62-930961742344": [
+        "fpga-16",
+        "3ff5ee1b-9155-4249-ad6d-2f9f6c31ef8f-A-C"
+      ],
+      "420f5dc2-37aa-439d-80b6-a7bf81a1d9ce": [
+        "fpga-9",
+        "3ff5ee1b-9155-4249-ad6d-2f9f6c31ef8f-A-B"
+      ],
+      "4311e2e2-147c-4163-ad4d-ee880e85f004": [
+        "fpga-4",
+        "3ff5ee1b-9155-4249-ad6d-2f9f6c31ef8f-A-A"
+      ],
+      "ab0f244d-6ed8-4670-b4f2-36ec8b491111": [
+        "clock_1-clk",
+        "fpga-0"
+      ]
+    },
+    "colors": {
+      "c3d32a73-d4d7-4a42-a73b-09691f1cd05f": "#f44336",
+      "e152c972-b9a1-4623-8f33-aa68ff6fa1cb": "#f44336",
+      "1123b6d1-0a46-4caa-b30b-1ff49503b296": "#f44336",
+      "feec963f-bd1e-4dfd-83b8-a3e2a09aa53b": "#f44336",
+      "f2a1bb89-4c65-4d31-9fd2-f1bcffa26459": "#f44336",
+      "75fd7adb-7f7b-4690-86f1-99a7c87a2b04": "#f44336",
+      "8dac614c-1d19-4895-bee3-976e74097909": "#f44336",
+      "0d155a1b-ed8a-49e5-aafc-407923eaa98b": "#f44336",
+      "9105ef55-0049-471a-b9da-af87803d5eea": "#f44336",
+      "5fb67390-abc9-47c3-898a-714b626d721e": "#f44336",
+      "26769352-feb5-4b22-89da-5d6eff534a3a": "#f44336",
+      "8c7ea4b2-7987-4ae3-917f-fc8c7d1f6419": "#f44336",
+      "2fcb49c1-1992-4adc-bff0-84331a90e53d": "#f44336",
+      "c0faac07-1a87-4ccb-9a74-8b95bc827f91": "#f44336",
+      "dea3aa2d-a90d-466a-ac62-930961742344": "#f44336",
+      "420f5dc2-37aa-439d-80b6-a7bf81a1d9ce": "#f44336",
+      "4311e2e2-147c-4163-ad4d-ee880e85f004": "#f44336",
+      "ab0f244d-6ed8-4670-b4f2-36ec8b491111": "#f44336"
+    },
+    "color": "#f44336"
+  },
+  "lang": "vhdl"
+}
