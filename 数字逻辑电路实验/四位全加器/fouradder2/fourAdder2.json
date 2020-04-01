@@ -1,0 +1,127 @@
+{
+  "redux": {
+    "top": "fouradder",
+    "signals": {
+      "b[3]": 12,
+      "a[3]": 16,
+      "b[2]": 17,
+      "a[2]": 5,
+      "b[1]": 6,
+      "b[0]": 11,
+      "a[1]": 10,
+      "a[0]": 15,
+      "cin": 19,
+      "cout": 4,
+      "s[3]": 8,
+      "s[2]": 13,
+      "s[1]": 18,
+      "s[0]": 7
+    },
+    "code": "library ieee;\r\nuse ieee.std_logic_1164.all;\r\n\r\n--Look Ahead Carry four-bit Adder, Time loss: 9ns--\r\nentity fouradder is\r\n    port(\r\n        a, b: in std_logic_vector(3 downto 0);\r\n        cin: in std_logic;\r\n        s: out std_logic_vector(3 downto 0);\r\n        cout: out std_logic\r\n    );\r\nend fouradder;\r\n\r\n\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\n--一位全加器--\r\nentity fulladder is\r\n    port(\r\n        a, b, ci: in std_logic;\r\n        s: out std_logic;\r\n        p, g: buffer std_logic\r\n    );\r\nend fulladder;\r\n\r\n\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\n--一位半加器--\r\nentity halfadder is\r\n    port(\r\n        ain, bin: in std_logic;\r\n        so, co: out std_logic\r\n    );\r\nend halfadder;\r\n\r\narchitecture bhv_half of halfadder is\r\nbegin\r\n    co <= ain and bin;--for G_n\r\n    so <= ain xor bin;--for P_n\r\nend bhv_half;\r\n\r\narchitecture bhv_full of fulladder is\r\n    component halfadder\r\n        port(\r\n            ain, bin: in std_logic;\r\n            so, co: out std_logic\r\n        );\r\n    end component;\r\nbegin\r\n    u1: halfadder port map(ain=>a, bin=>b, so=>p, co=>g);\r\n    s <= ci xor p;\r\nend bhv_full;\r\n\r\narchitecture bhv of fouradder is\r\n    component fulladder\r\n        port(\r\n            a, b, ci: in std_logic;\r\n            p, g, s: out std_logic\r\n        );\r\n    end component;\r\n    signal p, g, c: std_logic_vector(3 downto 0);\r\nbegin\r\n    u0: fulladder port map(a=>a(0), b=>b(0), ci=>cin, p=>p(0), g=>g(0), s=>s(0));\r\n    u1: for i in 1 to 3 generate--使用生成语句，元件例化\r\n        ux: fulladder port map(a=>a(i), b=>b(i), ci=>c(i-1), p=>p(i), g=>g(i), s=>s(i));\r\n    end generate;\r\n    --超前进位部分--\r\n    c(0) <= g(0) or (p(0) and cin);\r\n    c(1) <= g(1) or (p(1) and g(0)) or (p(1) and p(0) and cin);\r\n    c(2) <= g(2) or (p(2) and g(1)) or (p(2) and p(1) and g(0)) \r\n                 or (p(2) and p(1) and p(0) and cin);\r\n    c(3) <= g(3) or (p(3) and g(2)) or (p(3) and p(2) and g(1)) \r\n                 or (p(3) and p(2) and p(1) and g(0)) \r\n                 or (p(3) and p(2) and p(1) and p(0) and cin);\r\n    cout <= c(3);\r\nend bhv;",
+    "field": [
+      {
+        "type": "FPGA",
+        "x": 0,
+        "y": 0,
+        "id": "fpga",
+        "persistent": true
+      },
+      {
+        "type": "Switch4",
+        "x": 175,
+        "y": 175,
+        "id": "switch4_1"
+      },
+      {
+        "type": "Clock",
+        "x": 350,
+        "y": 175,
+        "id": "clock_1"
+      },
+      {
+        "type": "Switch4",
+        "id": "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd",
+        "x": 0,
+        "y": 175
+      }
+    ]
+  },
+  "sandbox": {
+    "groups": {
+      "627291c3-7a23-4b18-bc03-b5c15149c8a4": [
+        "clock_1-clk",
+        "fpga-19"
+      ],
+      "15e76efd-9f3d-48c0-a34c-c7758884dbe7": [
+        "switch4_1-switch-0",
+        "fpga-16"
+      ],
+      "bbd39038-d0f0-44d5-8645-7b121a6648eb": [
+        "switch4_1-switch-1",
+        "fpga-5"
+      ],
+      "0e72deea-c115-4cd0-9525-7d542b0edcb1": [
+        "switch4_1-switch-2",
+        "fpga-10"
+      ],
+      "eaf1adf1-3688-4b71-9bc0-51d9b7131856": [
+        "switch4_1-switch-3",
+        "fpga-15"
+      ],
+      "e26ee4bd-6ae8-473b-be4b-f8d53827b2da": [
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-0",
+        "fpga-12"
+      ],
+      "4f0585c6-3824-4d26-bbc9-33c8095a81b4": [
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-1",
+        "fpga-17"
+      ],
+      "e3850b3a-3fb4-4be3-b300-1ba8b29963c9": [
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-2",
+        "fpga-6"
+      ],
+      "a392be1b-09b1-4ad7-8a65-a442c3b2a819": [
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-3",
+        "fpga-11"
+      ],
+      "0b7fd591-c836-4b2e-b061-f70638a03471": [
+        "switch4_1-led-3",
+        "fpga-7"
+      ],
+      "f49fe577-c149-4ac8-9028-8ec6cd388196": [
+        "switch4_1-led-2",
+        "fpga-18"
+      ],
+      "344d28af-0e36-485d-865b-1fe7a327af64": [
+        "switch4_1-led-1",
+        "fpga-13"
+      ],
+      "0e503896-9d31-4628-891e-70c3ba2e142a": [
+        "switch4_1-led-0",
+        "fpga-8"
+      ],
+      "ad840973-56e9-45b0-9700-d994f81f9694": [
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-led-3",
+        "fpga-4"
+      ]
+    },
+    "colors": {
+      "627291c3-7a23-4b18-bc03-b5c15149c8a4": "#f44336",
+      "15e76efd-9f3d-48c0-a34c-c7758884dbe7": "#f44336",
+      "bbd39038-d0f0-44d5-8645-7b121a6648eb": "#f44336",
+      "0e72deea-c115-4cd0-9525-7d542b0edcb1": "#f44336",
+      "eaf1adf1-3688-4b71-9bc0-51d9b7131856": "#f44336",
+      "e26ee4bd-6ae8-473b-be4b-f8d53827b2da": "#f44336",
+      "4f0585c6-3824-4d26-bbc9-33c8095a81b4": "#f44336",
+      "e3850b3a-3fb4-4be3-b300-1ba8b29963c9": "#f44336",
+      "a392be1b-09b1-4ad7-8a65-a442c3b2a819": "#f44336",
+      "0b7fd591-c836-4b2e-b061-f70638a03471": "#f44336",
+      "f49fe577-c149-4ac8-9028-8ec6cd388196": "#f44336",
+      "344d28af-0e36-485d-865b-1fe7a327af64": "#f44336",
+      "0e503896-9d31-4628-891e-70c3ba2e142a": "#f44336",
+      "ad840973-56e9-45b0-9700-d994f81f9694": "#f44336"
+    },
+    "color": "#f44336"
+  },
+  "lang": "vhdl"
+}

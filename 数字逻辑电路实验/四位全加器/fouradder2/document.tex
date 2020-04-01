@@ -1,0 +1,307 @@
+
+\documentclass[UTF8, onecolumn, a4paper]{article}
+\usepackage{ctex}
+\setlength{\parindent}{2em}
+\usepackage{appendix}
+\usepackage{geometry}
+\usepackage{amsmath, amsthm}
+\usepackage{multirow, multicol}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{lettrine}
+\usepackage{authblk}
+\usepackage{indentfirst}
+\usepackage{xcolor, fontspec}%用于设置颜色
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{listings}%用于显示代码
+\usepackage[colorlinks,
+linkcolor=red,
+anchorcolor=blue,
+citecolor=green
+]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{trees}
+\geometry{left=2.5cm,right=2.5cm,top=2.0cm,bottom=2.0cm}
+
+
+\title{\textbf{四位加法器: 实验报告}}%———总标题
+\author{刘泓尊\quad 2018011446\quad 计84}
+%\affil{Department of Computer Science, Tsinghua University}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\lstset{%代码块全局设置
+	backgroundcolor=\color{red!3!green!3!blue!3},%代码块背景色为浅灰色
+	rulesepcolor= \color{gray}, %代码块边框颜色
+	breaklines=true,  %代码过长则换行
+	numbers=left, %行号在左侧显示
+	numberstyle= \small,%行号字体
+	%keywordstyle= \color{red},%关键字颜色
+	commentstyle=\color{gray}, %注释颜色
+	frame=shadowbox,%用方框框住代码块
+	xleftmargin=1em,
+	xrightmargin=0em,
+	tabsize=5,
+	%rulesepcolor=\color{red!20!green!20!blue!20},  %阴影颜色
+	keywordstyle={\color{blue!90!}\fontspec{Consolas Bold}},   %关键字颜色
+	commentstyle={\color{blue!70!black}\fontspec{Consolas Italic}},   %注释颜色
+	stringstyle=\color{orange!100!black}, %字符串颜色
+	numberstyle=\color{purple}, %行号颜色
+	%basicstyle=\ttfamily, %代码风格
+	basicstyle=\fontspec{Consolas},
+	showstringspaces=false,          % underline spaces within strings only  
+	showtabs=false,
+	captionpos=t, %文件标题位置
+	flexiblecolumns
+}
+%\vspace*{20}
+\section{File Structure}
+\tikzstyle{every node}=[draw=black,thick,anchor=west]
+\tikzstyle{selected}=[draw=red,fill=red!30]
+\tikzstyle{optional}=[dashed,fill=gray!50]
+\begin{center}
+	\begin{tikzpicture}
+	[
+	grow via three points={one child at (0.5,-0.7) and
+		two children at (0.5,-0.7) and (0.5,-1.4)},
+	edge from parent path={(\tikzparentnode.south)  |-(\tikzchildnode.west)}]
+	\node {2018011446}
+	child { node {fouradder1}
+		child {node {fouradder.vhd}}
+		child {node {fulladder.vhd}}
+		child {node {halfadder.vhd}}
+		child {node {Waveform.vwf}}
+		child {node {fourAdder1.mp4}}
+		child {node {fourAdder1.json}}
+	}
+	child [missing] {}				
+	child [missing] {}
+	child [missing] {}
+	child [missing] {}
+	child [missing] {}
+	child [missing] {}
+	child { node {fouradder2}
+		child {node {fouradder.vhd}}
+		child {node {fulladder.vhd}}
+		child {node {halfadder.vhd}}
+		child {node {Waveform.vwf}}
+		child {node {fourAdder2.mp4}}
+		child {node {fourAdder2.json}}
+	}
+	child [missing] {}	
+	child [missing] {}				
+	child [missing] {}
+	child [missing] {}
+	child [missing] {}
+	child [missing] {}
+	child { node {2018011446\_刘泓尊\_四位加法器.pdf}};
+	\end{tikzpicture}
+\end{center}
+
+\section{实验目的}
+\begin{enumerate}
+	\item[(1)] 掌握组合逻辑电路的基本分析和设计方法.
+	\item[(2)] 理解半加器和全加器工作原理并掌握利用全加器构成不同字长加法器的各种方法.
+	\item[(3)] 学习元件例化的方式进行硬件电路设计.
+	\item[(4)] 学会利用软件仿真实现对数字电路的逻辑功能进行验证和分析.
+\end{enumerate}
+\section{实验任务}
+\begin{enumerate}
+	\item[(1)] 设计实现逐次进位加法器，使用"半加器$\rightarrow$全加器$\rightarrow$逐次进位加法器"方式，进行“功能仿真”并在实验平台上测试。
+	\item[(2)] 设计实现超前进位加法器，使用"半加器$\rightarrow$全加器$\rightarrow$超前进位加法器"方式，进行“功能仿真”并在实验平台上测试。
+\end{enumerate}
+	
+
+\section{逐次进位加法器}
+本部分代码位于./fouradder1下
+\subsection{1位半加器}
+半加器的实现十分简单，只需要处理$S = A \oplus B$, $C = AB$即可，具体实现如下:
+\begin{lstlisting}[language={VHDL}, title={halfadder.vhd}]
+--一位半加器--
+entity halfadder is
+	port(
+		a, b: in std_logic;
+		so, co: out std_logic
+	);
+end halfadder;
+
+architecture bhv_half of halfadder is
+begin
+	co <= a and b;
+	so <= a xor b;
+end bhv_half;
+\end{lstlisting}
+\subsection{1位全加器}
+采用元件例化的方式，使用2个半加器实现全加器。
+\begin{lstlisting}[language={VHDL}, title={fulladder.vhd}]
+--一位全加器--
+entity fulladder is
+	port(
+		ain, bin, ci: in std_logic;
+		s, co: out std_logic
+	);
+end fulladder;
+
+architecture bhv_full of fulladder is
+	component halfadder
+		port(
+			a, b: in std_logic;
+			so, co: out std_logic
+		);
+	end component;
+	signal s1, c1, c2: std_logic;
+begin
+	u1: halfadder port map(a=>ain, b=>bin, so=>s1, co=>c1);--元件例化
+	u2: halfadder port map(a=>s1, b=>ci, so=>s, co=>c2);
+	co <= c1 or c2;
+end bhv_full;
+\end{lstlisting}
+\subsection{4位逐次进位加法器}
+基于上面实现的1位全加器，可以用串行的策略实现4位逐次进位加法器。
+\begin{lstlisting}[language={VHDL}, title={fouradder.vhd}]
+--逐次进位加法器，时延9ns左右--
+entity fouradder is
+	port(
+		a, b: in std_logic_vector(3 downto 0);
+		cin: in std_logic;
+		s: out std_logic_vector(3 downto 0);
+		cout: out std_logic
+	);
+end fouradder;
+
+architecture bhv of fouradder is
+	component fulladder
+		port(
+			ain, bin, ci: in std_logic;
+			s, co: out std_logic
+		);
+	end component;
+	signal c: std_logic_vector(3 downto 0);
+begin
+	u1: fulladder port map(ain=>a(0), bin=>b(0), ci=>cin , s=>s(0), co=>c(0) );--元件例化
+	u2: fulladder port map(ain=>a(1), bin=>b(1), ci=>c(0), s=>s(1), co=>c(1) );
+	u3: fulladder port map(ain=>a(2), bin=>b(2), ci=>c(1), s=>s(2), co=>c(2) );
+	u4: fulladder port map(ain=>a(3), bin=>b(3), ci=>c(2), s=>s(3), co=>cout );
+end bhv;
+\end{lstlisting}
+\subsection{仿真结果}
+使用Quartus的ModelSim进行仿真(附"\textbf{Waveform.vwf}"文件)，结果如下
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=1.0\textwidth]{simulation1.png}
+\end{figure}
+从图中可以看到，逐次进位加法器的平均时延约在$10ns$左右，但是在有些情况下会达到$12ns$，电路正确实现了加法功能。
+\subsection{JieLab运行结果(附录屏)}
+\paragraph*{}
+我将代码放在了JieLab实验平台上进行了验证，下面是运行时的截图，在fourAdder1目录下有"\textbf{fourAdder1.mp4}"，您可以更直观地检查我的实现效果.同时附JieLabs导出的fourAdder1.json文件，便于您在平台上进行验证。
+\paragraph*{}
+下面我给出测试过程中的截图，该图计算了$1111 + 1110 + 1 = 11110$.示数和开关的数位均为“左高右低”，与手写形式一致，以便于观察。左下两个板子的4个开关分别代表一个二进制数，最右侧一个板子的开关clk代表$C_{-1}$.
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fourAdder1.png}
+\end{figure}
+
+
+\section{超前进位加法器}
+本部分代码位于./fouradder2下
+\subsection{1位半加器}
+1位半加器的实现和上面"逐次进位加法器"的1位半加器相同，在此不再赘述。
+\subsection{1位全加器}
+1位全加器相对于“逐次进位加法器”的1位全加器，主要是增加了“进位产生函数$G_n$”和“进位传递函数$P_n$”.使用$buffer$实现。全加器的实现同样使用了半加器的“例化”。
+\begin{lstlisting}[language={VHDL}, title={fulladder.vhd}]
+--一位全加器--
+entity fulladder is
+	port(
+		a, b, ci: in std_logic;
+		s: out std_logic;
+		p, g: buffer std_logic
+	);
+end fulladder;
+
+architecture bhv_full of fulladder is
+	component halfadder
+		port(
+			ain, bin: in std_logic;
+			so, co: out std_logic
+		);
+	end component;
+begin
+	u1: halfadder port map(ain=>a, bin=>b, so=>p, co=>g);--半加器例化
+	s <= ci xor p;
+end bhv_full;
+\end{lstlisting}
+\subsection{4位超前进位加法器}
+4位超前进位加法器的关键是“超前进位单元”，超前进位的输出表达式如下:
+\begin{equation*}
+\begin{aligned}
+	C_0 &= G_0 + P_0C_{-1}\\
+	C_1 &= G_1 + P_1G_0 + P_1P_0C_{-1}\\
+	C_2 &= G_2 + P_2G_1 + P_2P_1G_0 + P_2P_1P_0C_{-1}\\
+	C_3 &= G_3 + P_3G_2 + P_3P_2G_1 + P_3P_2P_1G_0 + P_3P_2P_1P_0C_{-1}
+\end{aligned}
+\end{equation*}
+基于上述逻辑，可以使用元件例化的方式得到$P_i, G_i$,之后处理超前进位部分。代码如下:
+\begin{lstlisting}[language={VHDL}, title={fouradder.vhd}]
+--Look Ahead Carry four-bit Adder, Time delay: 9ns--
+entity fouradder is
+	port(
+		a, b: in std_logic_vector(3 downto 0);
+		cin: in std_logic;
+		s: out std_logic_vector(3 downto 0);
+		cout: out std_logic
+	);
+end fouradder;
+
+architecture bhv of fouradder is
+	component fulladder
+		port(
+			a, b, ci: in std_logic;
+			p, g, s: out std_logic
+		);
+	end component;
+signal p, g, c: std_logic_vector(3 downto 0);
+
+begin
+	u0: fulladder port map(a=>a(0), b=>b(0), ci=>cin, p=>p(0), g=>g(0), s=>s(0));
+	u1: for i in 1 to 3 generate--使用生成语句，元件例化
+		ux: fulladder port map(a=>a(i), b=>b(i), ci=>c(i-1), p=>p(i), g=>g(i), s=>s(i));
+	end generate;
+	--超前进位部分--
+	c(0) <= g(0) or (p(0) and cin);
+	c(1) <= g(1) or (p(1) and g(0)) or (p(1) and p(0) and cin);
+	c(2) <= g(2) or (p(2) and g(1)) or (p(2) and p(1) and g(0)) 
+				 or (p(2) and p(1) and p(0) and cin);
+	c(3) <= g(3) or (p(3) and g(2)) or (p(3) and p(2) and g(1)) 
+				 or (p(3) and p(2) and p(1) and g(0)) 
+				 or (p(3) and p(2) and p(1) and p(0) and cin);
+	cout <= c(3);
+end bhv;
+\end{lstlisting}
+\subsection{仿真结果}
+使用Quartus的ModelSim进行仿真(附"\textbf{Waveform.vwf}"文件)，结果如下
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=1.0\textwidth]{simulation2.png}
+\end{figure}
+\paragraph*{}
+从图中可以看到，超前进位加法器的平均时延约在$9ns$左右，速度只比逐次进位快一点，但是在更新的时候会有短暂的“毛刺”，电路正确实现了加法功能。初步猜测超前进位没有明显加速的原因是超前进位单元有大量的逻辑运算，会拖慢速度。
+\subsection{JieLab运行结果(附录屏)}
+\paragraph*{}
+我将代码放在了JieLab实验平台上进行了验证，下面是运行时的截图，在fourAdder2目录下有"\textbf{fourAdder2.mp4}"，您可以更直观地检查我的实现效果. 同时附JieLabs导出的fourAdder2.json文件，便于您在平台上进行验证。
+\paragraph*{}
+下面我给出测试过程中的截图，该图计算了$0010 + 1110 + 1 = 10001$.示数和开关的数位均为“左高右低”，与手写形式一致，以便于观察。左下两个板子的4个开关分别代表一个二进制数，最右侧一个板子的开关clk代表$C_{-1}$.
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fourAdder2.png}
+\end{figure}
+
+
+\section{实验总结}
+\paragraph*{}
+在两个任务完成后，我又测试了VHDL自带加法器的延时，得到的时延依然为$9ns$左右，但是毛刺比较少，延时更加均衡。但我没有找到相关资料讲解VHDL自带的加法器，希望有时间深入研究一下。
+\paragraph*{}
+这是我第二次进行CPLD的实验，有了上一次的练习，这次的实验十分顺利，VHDL代码也是一次成形，没有遇到bug。我学到了“元件例化”的方法，极大地提高了硬件设计的简洁性，体会到了模块化设计在电路设计中的重要性。此次实验让我对全加器、超前进位机制等有了实践性的任务，切身体会到了硬件的延时，再次领会了"理论$\neq$实际"。感谢老师助教在微信群里的耐心指导!
+
+\end{document}
