@@ -1,4 +1,4 @@
-
+--一位全加器--
 library ieee;
 use ieee.std_logic_1164.all;
 
@@ -11,8 +11,13 @@ entity fulladder is
 end fulladder;
 
 architecture bhv_full of fulladder is
+    component halfadder
+        port(
+            ain, bin: in std_logic;
+            so, co: out std_logic
+        );
+    end component;
 begin
-    p <= a xor b;
-    g <= a and b;
+    u1: halfadder port map(ain=>a, bin=>b, so=>p, co=>g);
     s <= ci xor p;
 end bhv_full;
