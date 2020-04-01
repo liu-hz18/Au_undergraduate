@@ -71,15 +71,21 @@ citecolor=green
 	child { node {counter}
 		child {node {d\_ff.vhd}}
 		child {node {decoder.vhd}}
+		child {node {clkpersecond.vhd}}
 		child {node {fourbitcounter.vhd}}
 		child {node {counter.vhd}}
-		child {node {Waveform.vwf}}
+		child {node {Waveform.vwf}}	
 	}
-	child [missing] {}				
 	child [missing] {}
 	child [missing] {}
 	child [missing] {}
+	child [missing] {}					
 	child [missing] {}
+	child [missing] {}
+	child {node {counter-manual.mp4}}
+	child {node {counter-auto.mp4}}
+	child {node {counter-manual.json}}
+	child {node {counter-auto.json}}
 	child { node {2018011446\_刘泓尊\_计数器.pdf}};
 	\end{tikzpicture}
 \end{center}
@@ -100,7 +106,7 @@ citecolor=green
 \section{集成“手动”与“秒表”版本}
 支持“手动clk/秒表clk/暂停/复位”功能。
 \paragraph*{}
-我将两个部分功能实现了集成，在暂停时，可以手动按下clk实现计数器的加一。再次按下pause后，可以开启秒表模式，在当前计数基础上进行每1s一次的计数。在实现过程中，我使用了大量“元件例化”的方法，并且没有使用"+"。本部分代码位于./counter下
+我将两个部分功能实现了集成，$mode = '0'$的时候是手动模式，可以手动按下clk实现计数器的加一。$mode='1'$是秒表模式，可以开启秒表模式，在当前计数基础上进行每1s一次的计数。在实现过程中，我使用了大量“元件例化”的方法，并且没有使用"+"。本部分代码位于./counter下。
 
 \subsection{D触发器的实现}
 践行模块化设计的思路，我实现了D触发器，实现如下:
@@ -138,7 +144,7 @@ end bhv;
 
 \subsection{计时器模块}
 为了实现“计时”与“计数”的解耦，我将计时器单独作为一个模块。该模块通过记录时钟上升沿个数，每个1M次时钟周期产生一次脉冲。在1MHz的时钟频率下，该模块将产生每1s一次的脉冲，代码如下:
-\begin{lstlisting}[language={VHDL}, title={.vhd}]
+\begin{lstlisting}[language={VHDL}, title={clkpersecond.vhd}]
 -- 产生秒表序列(时钟频率1MHz: 产生1s的周期序列) --
 entity clkpersecond is
 	port(
@@ -151,7 +157,7 @@ end clkpersecond;
 architecture bhv of clkpersecond is
 	signal outclk: std_logic := '0';
 	signal count: integer := 0;
-	constant FREQUENCY: integer := 1000000/2;--设置时钟频率1MHz
+	constant FREQUENCY: integer := 500000;--设置时钟频率1MHz(即1000000/2)
 begin
 	clkps <= outclk;
 	process(clk, rst) begin
@@ -196,6 +202,7 @@ end component;
 	signal q_buf: std_logic_vector(3 downto 0);
 	signal nq_buf: std_logic_vector(3 downto 0);
 begin
+	--使用4个d触发器实现4位二进制的自增
 	u0: d_ff port map(clk=>clk, rst=>rst, pause=>pause, d=>nq_buf(0), q=>q_buf(0), nq=>nq_buf(0) );
 	u1: d_ff port map(clk=>nq_buf(0), rst=>rst, pause=>pause, d=>nq_buf(1), q=>q_buf(1), nq=>nq_buf(1) );
 	u2: d_ff port map(clk=>nq_buf(1), rst=>rst, pause=>pause, d=>nq_buf(2), q=>q_buf(2), nq=>nq_buf(2) );
@@ -204,7 +211,7 @@ begin
 end bhv;
 \end{lstlisting}
 \subsection{计数器}
-有了上面实现的四位计数器和计时器模块，可以很方便地实现计数器了。该模块是顶层实体，通过计时器识别时钟信号并给出1s一次的脉冲，之后四位计数器实现一次自增，最终将输出结果经过译码器进行显示。代码如下:
+有了上面实现的四位计数器和计时器模块，可以很方便地实现计数器了。该模块是顶层实体，通过计时器识别时钟信号并给出1s一次的脉冲，之后四位计数器实现一次自增，最终将输出结果经过译码器(decoder模块与“点亮数字人生”中的模块相同，在此不予赘述)进行显示。代码如下:
 \begin{lstlisting}[language={VHDL}, title={counter.vhd}]
 -- 计数器(用数码管显示，支持手动clk/秒表clk/暂停/复位 功能, 60进制) --
 entity counter is
@@ -219,13 +226,13 @@ entity counter is
 end counter;
 
 architecture bhv of counter is
-	component decoder
+	component decoder--译码器
 		port(
 			bit_4_vec: in std_logic_vector(3 downto 0);
 			bit_7_vec: out std_logic_vector(6 downto 0)
 		);
 	end component;
-	component fourbitcounter
+	component fourbitcounter--四位加法计数器
 		port(
 			clk: in std_logic;
 			rst: in std_logic;
@@ -233,44 +240,77 @@ architecture bhv of counter is
 			qvec: out std_logic_vector(3 downto 0)
 		);
 	end component;
-	component clkpersecond
+	component clkpersecond--产生1s一个上升沿的周期信号
 		port(
 			clk: in std_logic;
 			rst: in std_logic;
 			clkps: out std_logic
 		);
 	end component;
-	signal clockUsing: std_logic;
-	signal clockPerSecond: std_logic;
-	signal resetLow: std_logic := '0';
-	signal resetHigh: std_logic := '0';
-	signal outputLow: std_logic_vector(3 downto 0);
-	signal outputHigh: std_logic_vector(3 downto 0);
+    signal clockUsing: std_logic;--当前使用的clk, 用于区分手动和秒表
+	signal clockPerSecond: std_logic;--每1s一次上升沿的clk
+	signal tempresetLow: std_logic := '0';
+	signal tempresetHigh: std_logic := '0';
+	signal resetLow: std_logic := '0';--低位复位
+	signal resetHigh: std_logic := '0';--高位复位
+	signal outputLow: std_logic_vector(3 downto 0);--低位输出(4位二进制)
+	signal outputHigh: std_logic_vector(3 downto 0);--高位输出(4位二进制)
 begin
 	clockUsing <= clockPerSecond when mode = '1' else clk;
-	resetLow <= '1' when outputLow = "1010" else '0';--到10进1   
-	resetHigh <= '1' when outputLow = "0000" and outputHigh = "0110" else '0';--到60归零
-	getclk: clkpersecond port map(clk=>clk, rst=>rst, clkps=>clockPerSecond);
-	u1: fourbitcounter port map(clk=>clockUsing, rst=>(rst or resetLow), pause=>pause, qvec=>outputLow );
-	u2: fourbitcounter port map(clk=>resetLow, rst=>(rst or resetHigh), pause=>pause, qvec=>outputHigh );
+	getclk:clkpersecond port map(clk=>clk, rst=>rst, clkps=>clockPerSecond);
+	u1:fourbitcounter port map(clk=>clockUsing, rst=>resetLow, pause=>pause, qvec=>outputLow );
+	u2:fourbitcounter port map(clk=>resetLow, rst=>resetHigh, pause=>pause, qvec=>outputHigh );
 	decoder1: decoder port map(bit_4_vec=>outputLow, bit_7_vec=>lowcode);
 	decoder2: decoder port map(bit_4_vec=>outputHigh, bit_7_vec=>highcode);
-end bhv;aa
+	tempresetLow <= '1' when outputLow = "1010" else '0';--到10进1   
+	tempresetHigh <= '1' when outputHigh >= "0110" else '0';--到60归零
+	resetLow <= rst or tempresetLow; resetHigh <= rst or tempresetHigh;
+end bhv;
 \end{lstlisting}
 
 \section{仿真结果}
-使用Quartus的ModelSim进行仿真(根目录附"\textbf{Waveform.vwf}"文件)，结果如下
+使用Quartus的ModelSim进行仿真(附"\textbf{./counter/Waveform.vwf}"文件).
+进行功能仿真的结果如下，第一幅图展示了包含“暂停”和“复位”功能。输出时经过译码后的7位二进制数。第二幅图展示了到达59之后自动回到0的过程。
 \begin{figure}[htb]
 	\centering
-	%\includegraphics[width=1.0\textwidth]{}
+	\includegraphics[width=1.0\textwidth]{simulation1.png}
+	\caption{包含“暂停”和“复位”功能}
+\end{figure}
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=1.0\textwidth]{simulation2.png}
+	\caption{到达59之后自动回到0}
+\end{figure}
+\clearpage
+\paragraph*{}
+下图是时序仿真的结果。展示了包含“暂停”和“复位”功能。
+\begin{figure}[htb]
+	\centering
+	\includegraphics[width=1.0\textwidth]{simulation4.png}
+	\caption{时序仿真}
 \end{figure}
 \section{JieLab运行结果(附录屏)}
-我将代码放在了JieLab实验平台上进行了验证，下面是运行时的截图，在根目录下有"\textbf{JieLabs录屏.mp4}"，您可以更直观地检查我的实现效果
+我将代码放在了JieLabs实验平台上进行了验证，下面是运行时的截图，在目录下有"\textbf{counter-manual.mp4}"(手动计数)和"\textbf{conuter-auto.mp4}"(秒表功能)，视频中还展示了“暂停”，“复位”等功能。您可以更直观地检查我的实现效果。同时附件中提供了从JieLabs存档的“counter-manual.json”和“conuter-auto.json”。
+\paragraph*{}
+注:左下角板块的第一个开关代表“mode”，mode = 1时是秒表模式，mode = 0是手动模式。第二个开关代表“暂停”。
 \begin{figure}[htb]
 	\centering
-	%\includegraphics[width=0.8\textwidth]{}
+	\subfigure{
+		\begin{minipage}[t]{0.48\linewidth}
+			\centering
+			\includegraphics[width=\textwidth]{counter1.png}
+			\caption{手动模式-截图}
+		\end{minipage}
+	}
+	\subfigure{
+		\begin{minipage}[t]{0.45\linewidth}
+			\centering
+			\includegraphics[width=\textwidth]{counter2.png}
+			\caption{秒表模式-截图}
+		\end{minipage}
+	}
 \end{figure}
 \section{实验总结}
 \paragraph*{}
-本次实验我采用了大量的“元件例化”方法，在极大程度上实现了“解耦”与模块化设计，我的VHDL编程能力得到了极大提升。我自己实现了d触发器，使用时序逻辑的方式实现了计数器，而不是简单地使用"+1"语句，因此，我切身体会到了时序逻辑的设计方法和电路特点，没有依赖软件的编译与自动转换，对时序逻辑的增进了理解。同时，我也被硬件所能实现的众多有趣功能所吸引，希望在将来能设计出更多有意义的电路。感谢老师助教在微信群中的耐心指导!
+本次实验我采用了大量的“元件例化”方法，在极大程度上实现了“解耦”与模块化设计，我的VHDL编程能力得到了极大提升。我自己实现了d触发器，进而使用时序逻辑的方式实现了计数器，而不是简单地使用"+1"语句，切身体会到了时序逻辑的设计方法和电路特点，没有依赖软件的编译与自动转换，对时序逻辑的增进了理解。同时，我也被硬件所能实现的众多有趣功能所吸引，希望在将来能设计出更多有意义的电路。感谢老师助教在微信群中的耐心指导!
 \end{document}

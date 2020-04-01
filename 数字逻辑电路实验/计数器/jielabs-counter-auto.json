@@ -1,0 +1,151 @@
+{
+  "redux": {
+    "top": "counter",
+    "signals": {
+      "lowcode[6]": 17,
+      "clk": 3,
+      "lowcode[5]": 6,
+      "lowcode[4]": 11,
+      "mode": 12,
+      "lowcode[3]": 16,
+      "lowcode[2]": 5,
+      "lowcode[1]": 10,
+      "lowcode[0]": 15,
+      "rst": 0,
+      "highcode[6]": 9,
+      "highcode[5]": 14,
+      "highcode[4]": 19,
+      "pause": 4,
+      "highcode[3]": 8,
+      "highcode[2]": 13,
+      "highcode[1]": 18,
+      "highcode[0]": 7
+    },
+    "code": "-- Decoder: 4-bit Binary Code -> 7 code --\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\nuse ieee.std_logic_arith.all;\r\nuse ieee.std_logic_unsigned.all;\r\n\r\nentity decoder is\r\n    port(\r\n        bit_4_vec: in std_logic_vector(3 downto 0);\r\n        bit_7_vec: out std_logic_vector(6 downto 0)\r\n    );\r\nend decoder;\r\n\r\narchitecture bhv_decoder of decoder is\r\nbegin\r\n    process(bit_4_vec)\r\n    begin\r\n        case bit_4_vec is --译码处理\r\n            when \"0000\" => bit_7_vec <= \"1111110\";\r\n            when \"0001\" => bit_7_vec <= \"0110000\";\r\n            when \"0010\" => bit_7_vec <= \"1101101\";\r\n            when \"0011\" => bit_7_vec <= \"1111001\";\r\n            when \"0100\" => bit_7_vec <= \"0110011\";\r\n            when \"0101\" => bit_7_vec <= \"1011011\";\r\n            when \"0110\" => bit_7_vec <= \"1011111\";\r\n            when \"0111\" => bit_7_vec <= \"1110000\";\r\n            when \"1000\" => bit_7_vec <= \"1111111\";\r\n            when \"1001\" => bit_7_vec <= \"1110011\";\r\n            when \"1010\" => bit_7_vec <= \"1110111\";\r\n            when \"1011\" => bit_7_vec <= \"0011111\";\r\n            when \"1100\" => bit_7_vec <= \"1001110\";\r\n            when \"1101\" => bit_7_vec <= \"0111101\";\r\n            when \"1110\" => bit_7_vec <= \"1001111\";\r\n            when \"1111\" => bit_7_vec <= \"1000111\";\r\n            when others => bit_7_vec <= \"0000000\"; --其他情况全灭\r\n        end case;\r\n    end process;\r\nend bhv_decoder;\r\n\r\n-- 异步复位D触发器 --\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\nuse ieee.std_logic_arith.all;\r\nuse ieee.std_logic_unsigned.all;\r\n\r\nentity d_ff is\r\n    port(\r\n        clk: in std_logic;\r\n        rst: in std_logic;\r\n        pause: in std_logic;\r\n        d: in std_logic;\r\n        q: out std_logic;\r\n        nq: out std_logic\r\n    );\r\nend d_ff;\r\n\r\narchitecture bhv_d of d_ff is\r\nbegin\r\n    process(clk, rst) begin\r\n        if rst = '1' then\r\n            q <= '0';\r\n            nq <= '1';\r\n        elsif clk'event and clk='1' then\r\n            if pause='0' then\r\n                q <= d;\r\n                nq <= not d;\r\n            else --维持不变\r\n                q <= not d;\r\n                nq <= d;\r\n            end if;\r\n        end if;\r\n    end process; \r\nend bhv_d;\r\n\r\n-- 产生秒表序列(时钟频率1MHz: 产生1s的周期序列) --\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\nuse ieee.std_logic_arith.all;\r\nuse ieee.std_logic_unsigned.all;\r\n\r\nentity clkpersecond is\r\n    port(\r\n        clk: in std_logic;\r\n        rst: in std_logic;\r\n        clkps: out std_logic\r\n    );\r\nend clkpersecond;\r\n\r\narchitecture bhv_ps of clkpersecond is\r\n    signal outclk: std_logic := '0';\r\n    signal count: integer := 0;\r\n    constant FREQUENCY: integer := 500000;--设置时钟频率1MHz\r\nbegin\r\n    clkps <= outclk;\r\n    process(clk, rst) begin\r\n        if rst = '1' then\r\n            count <= 0;\r\n            outclk <= '0';\r\n        elsif clk'event and clk='1' then\r\n            if count < FREQUENCY then\r\n                count <= count + 1;\r\n            else\r\n                count <= 0;\r\n                outclk <= (not outclk);--跳变\r\n            end if;\r\n        end if;\r\n    end process;\r\nend bhv_ps;\r\n\r\n-- 四位加法计数器 --\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\nuse ieee.std_logic_arith.all;\r\nuse ieee.std_logic_unsigned.all;\r\n\r\nentity fourbitcounter is\r\n    port(\r\n        clk: in std_logic;\r\n        rst: in std_logic;\r\n        pause: in std_logic;\r\n        qvec: out std_logic_vector(3 downto 0)\r\n    );\r\nend fourbitcounter;\r\n\r\narchitecture bhv_four of fourbitcounter is\r\n    component d_ff\r\n        port(\r\n            clk: in std_logic;\r\n            rst: in std_logic;\r\n            pause: in std_logic;\r\n            d: in std_logic;\r\n            q: out std_logic;\r\n            nq: out std_logic\r\n        );\r\n    end component;\r\n    signal q_buf: std_logic_vector(3 downto 0);\r\n    signal nq_buf: std_logic_vector(3 downto 0);\r\nbegin\r\n    u0: d_ff port map(clk=>clk, rst=>rst, pause=>pause, d=>nq_buf(0), q=>q_buf(0), nq=>nq_buf(0) );\r\n    u1: d_ff port map(clk=>nq_buf(0), rst=>rst, pause=>pause, d=>nq_buf(1), q=>q_buf(1), nq=>nq_buf(1) );\r\n    u2: d_ff port map(clk=>nq_buf(1), rst=>rst, pause=>pause, d=>nq_buf(2), q=>q_buf(2), nq=>nq_buf(2) );\r\n    u3: d_ff port map(clk=>nq_buf(2), rst=>rst, pause=>pause, d=>nq_buf(3), q=>q_buf(3), nq=>nq_buf(3) );\r\n    qvec <= q_buf;\r\nend bhv_four;\r\n\r\n-- 计数器(用数码管显示，支持手动clk/秒表clk/暂停/复位 功能, 60进制) --\r\nlibrary ieee;\r\nuse ieee.std_logic_1164.all;\r\nuse ieee.std_logic_arith.all;\r\nuse ieee.std_logic_unsigned.all;\r\n\r\nentity counter is\r\n    port(\r\n        clk: in std_logic;\r\n        rst: in std_logic;\r\n        pause: in std_logic;\r\n        mode: in std_logic;--mode = '1'的时候是秒表，否则是手动加\r\n        highcode: out std_logic_vector(6 downto 0);\r\n        lowcode: out std_logic_vector(6 downto 0)\r\n    );\r\nend counter;\r\n\r\narchitecture bhv of counter is\r\n    component decoder\r\n        port(\r\n            bit_4_vec: in std_logic_vector(3 downto 0);\r\n            bit_7_vec: out std_logic_vector(6 downto 0)\r\n        );\r\n    end component;\r\n    component fourbitcounter\r\n        port(\r\n            clk: in std_logic;\r\n            rst: in std_logic;\r\n            pause: in std_logic;\r\n            qvec: out std_logic_vector(3 downto 0)\r\n        );\r\n    end component;\r\n    component clkpersecond\r\n        port(\r\n            clk: in std_logic;\r\n            rst: in std_logic;\r\n            clkps: out std_logic\r\n        );\r\n    end component;\r\n    signal clockUsing: std_logic;\r\n    signal clockPerSecond: std_logic;\r\n    signal tempresetLow: std_logic := '0';\r\n    signal tempresetHigh: std_logic := '0';\r\n    signal resetLow: std_logic := '0';--低位复位\r\n    signal resetHigh: std_logic := '0';--高位复位\r\n    signal outputLow: std_logic_vector(3 downto 0);\r\n    signal outputHigh: std_logic_vector(3 downto 0);\r\nbegin\r\n    clockUsing <= clockPerSecond when mode = '1' else clk;\r\n    getclk: clkpersecond port map(clk=>clk, rst=>rst, clkps=>clockPerSecond);\r\n    u1: fourbitcounter port map(clk=>clockUsing, rst=>resetLow, pause=>pause, qvec=>outputLow );\r\n    u2: fourbitcounter port map(clk=>resetLow, rst=>resetHigh, pause=>pause, qvec=>outputHigh );\r\n    decoder1: decoder port map(bit_4_vec=>outputLow, bit_7_vec=>lowcode);\r\n    decoder2: decoder port map(bit_4_vec=>outputHigh, bit_7_vec=>highcode);\r\n    tempresetLow <= '1' when outputLow = \"1010\" else '0';--到10进1   \r\n    tempresetHigh <= '1' when outputHigh >= \"0110\" else '0';--到60归零\r\n    resetLow <= rst or tempresetLow;\r\n    resetHigh <= rst or tempresetHigh;\r\nend bhv;\r\n",
+    "field": [
+      {
+        "type": "FPGA",
+        "x": 0,
+        "y": 0,
+        "id": "fpga",
+        "persistent": true
+      },
+      {
+        "type": "Clock",
+        "x": 175,
+        "y": 175,
+        "id": "clock_1"
+      },
+      {
+        "type": "Switch4",
+        "id": "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd",
+        "x": 0,
+        "y": 175
+      },
+      {
+        "type": "Digit7",
+        "id": "e4537317-4cce-4a50-b183-0648fee081b3",
+        "x": 175,
+        "y": 0
+      }
+    ]
+  },
+  "sandbox": {
+    "groups": {
+      "dff2cb59-74c7-4223-8d0d-ba217a99bee5": [
+        "fpga-0",
+        "clock_1-clk"
+      ],
+      "05707bb9-2fab-4e62-9068-e1a55e6b0e5d": [
+        "fpga-12",
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-0"
+      ],
+      "c1c39a59-ed5a-416a-9c3a-318f688dfcf7": [
+        "fpga-9",
+        "e4537317-4cce-4a50-b183-0648fee081b3-A-A"
+      ],
+      "911b5b68-885a-4c57-804a-2c17ad631463": [
+        "fpga-14",
+        "e4537317-4cce-4a50-b183-0648fee081b3-A-B"
+      ],
+      "5128a308-fbc3-46e4-90d5-27c17a4fab71": [
+        "fpga-19",
+        "e4537317-4cce-4a50-b183-0648fee081b3-A-C"
+      ],
+      "8beeb128-0eb1-4de1-bed5-6279759db0ac": [
+        "fpga-8",
+        "e4537317-4cce-4a50-b183-0648fee081b3-A-D"
+      ],
+      "1e4fd633-e24a-41c9-8b1c-05ed066c62bf": [
+        "fpga-13",
+        "e4537317-4cce-4a50-b183-0648fee081b3-A-E"
+      ],
+      "76953b68-9bc2-4eb2-ad7b-fc8429e5ab58": [
+        "fpga-18",
+        "e4537317-4cce-4a50-b183-0648fee081b3-A-F"
+      ],
+      "3019e629-92b5-4189-a85c-f0c339790841": [
+        "fpga-7",
+        "e4537317-4cce-4a50-b183-0648fee081b3-A-G"
+      ],
+      "ec750df4-91d4-49c8-a70c-1bff1e56db7e": [
+        "fpga-17",
+        "e4537317-4cce-4a50-b183-0648fee081b3-B-A"
+      ],
+      "a3626d6e-cc55-4883-8e09-a82d1ce12409": [
+        "fpga-6",
+        "e4537317-4cce-4a50-b183-0648fee081b3-B-B"
+      ],
+      "7fa3d421-ece0-4c8f-8961-e5452e27a90f": [
+        "fpga-11",
+        "e4537317-4cce-4a50-b183-0648fee081b3-B-C"
+      ],
+      "e1ca1348-a2b6-464d-b97c-38df38547135": [
+        "fpga-16",
+        "e4537317-4cce-4a50-b183-0648fee081b3-B-D"
+      ],
+      "9e0b4ee6-7a33-4693-b9b8-af049e084e3b": [
+        "fpga-5",
+        "e4537317-4cce-4a50-b183-0648fee081b3-B-E"
+      ],
+      "cfe8230e-463c-4e13-992e-42f21c2fc124": [
+        "fpga-10",
+        "e4537317-4cce-4a50-b183-0648fee081b3-B-F"
+      ],
+      "eaa6b1df-8bc8-4a17-99da-17070b84aa91": [
+        "e4537317-4cce-4a50-b183-0648fee081b3-B-G",
+        "fpga-15"
+      ],
+      "81c6f03e-bd4a-47ba-b22d-a5e6134608e0": [
+        "fpga-4",
+        "ba7ddc73-b7bc-4e11-8dc5-58fff11c49fd-switch-1"
+      ],
+      "54853c3c-ed24-4e0b-903d-513381b726d0": [
+        "fpga-3",
+        "clock_1-1"
+      ]
+    },
+    "colors": {
+      "dff2cb59-74c7-4223-8d0d-ba217a99bee5": "#f44336",
+      "05707bb9-2fab-4e62-9068-e1a55e6b0e5d": "#f44336",
+      "c1c39a59-ed5a-416a-9c3a-318f688dfcf7": "#f44336",
+      "911b5b68-885a-4c57-804a-2c17ad631463": "#f44336",
+      "5128a308-fbc3-46e4-90d5-27c17a4fab71": "#f44336",
+      "8beeb128-0eb1-4de1-bed5-6279759db0ac": "#f44336",
+      "1e4fd633-e24a-41c9-8b1c-05ed066c62bf": "#f44336",
+      "76953b68-9bc2-4eb2-ad7b-fc8429e5ab58": "#f44336",
+      "3019e629-92b5-4189-a85c-f0c339790841": "#f44336",
+      "ec750df4-91d4-49c8-a70c-1bff1e56db7e": "#f44336",
+      "a3626d6e-cc55-4883-8e09-a82d1ce12409": "#f44336",
+      "7fa3d421-ece0-4c8f-8961-e5452e27a90f": "#f44336",
+      "e1ca1348-a2b6-464d-b97c-38df38547135": "#f44336",
+      "9e0b4ee6-7a33-4693-b9b8-af049e084e3b": "#f44336",
+      "cfe8230e-463c-4e13-992e-42f21c2fc124": "#f44336",
+      "eaa6b1df-8bc8-4a17-99da-17070b84aa91": "#f44336",
+      "81c6f03e-bd4a-47ba-b22d-a5e6134608e0": "#f44336",
+      "54853c3c-ed24-4e0b-903d-513381b726d0": "#f44336"
+    },
+    "color": "#f44336"
+  },
+  "lang": "vhdl"
+}

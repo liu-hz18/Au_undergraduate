@@ -17,8 +17,7 @@ end d_ff;
 
 architecture bhv of d_ff is
 begin
-    process(clk, rst)
-    begin
+    process(clk, rst) begin
         if rst = '1' then
             q <= '0';
             nq <= '1';
